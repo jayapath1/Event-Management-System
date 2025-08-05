@@ -26,9 +26,9 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-app.config['MYSQL_HOST'] = '127.0.0.1'
+app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '12345'
+app.config['MYSQL_PASSWORD'] = 'jayapath'
 app.config['MYSQL_DB'] = 'EMS'
 
 def create_db_connection():
