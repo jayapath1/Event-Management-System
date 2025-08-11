@@ -58,3 +58,5 @@ MySQL Connection Issues:
 - Ensure MySQL service is running
 - Verify your credential in app.py
 - Make sure the EMS database and tables exist
+Python Package Error:
+- Run **pip install -r requirements.txt**.

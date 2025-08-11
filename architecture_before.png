@@ -1,0 +1,27 @@
++--------------------+           +--------------------+           +------------------+
+|                    |           |                    |           |                  |
+|    User Browser    | <-------> |      Flask App     | <-------> |     MySQL DB     |
+| (templates + CSS)  |   HTTP/   |  (app.py backend)  |    SQL    |    (ems.sql)     |
+|                    |   HTTPS   |                    |           |                  |
++--------------------+           +--------------------+           +------------------+
+
+Elements:
+
+1. User Browser:  
+   - Requests pages like login, dashboard, event details.  
+   - Receives HTML rendered by Flask templates.
+
+2. Flask App (app.py):  
+   - Handles routing, business logic, user authentication.  
+   - Interacts with MySQL to read/write event, attendee, venue data.  
+   - Renders templates with dynamic content.
+
+3. MySQL Database:  
+   - Stores all persistent data: users, events, attendees, venues, tasks, etc.  
+   - Schema created by ems.sql.
+
+Communication Flow:  
+- User sends HTTP requests to Flask app.  
+- Flask queries MySQL for data.  
+- Flask renders HTML templates with data and responds to user.  
+- User interacts with the system via browser interface.
