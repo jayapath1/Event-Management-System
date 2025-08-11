@@ -1,0 +1,28 @@
++--------------------+           +--------------------+           +------------------+
+|                    |           |                    |           |                  |
+|    User Browser    | <-------> |   Flask/Java App   | <-------> |     MySQL DB     |
+| (templates + CSS)  |   HTTP/   |  (Event Backend)   |    SQL    |    (ems.sql)     |
+|                    |   HTTPS   |                    |           |                  |
++--------------------+           +---------+----------+           +------------------+
+                                            |
+                                            | Event Created/Updated
+                                            v
+                                +---------------------------+
+                                |   Advertising Service     |
+                                | (Python Mastodon API Bot) |
+                                +-------------+-------------+
+                                              |
+                                              | Post Event Ads
+                                              v
+                                +---------------------------+
+                                | Mastodon Instance (Cyber  |
+                                | Lab, already deployed)    |
+                                +---------------------------+
+
+                                            |
+                                            | Event Data Export
+                                            v
+                                +---------------------------+
+                                |   VR Export Service       |
+                                | (JSON/CSV/API Endpoint)   |
+                                +---------------------------+

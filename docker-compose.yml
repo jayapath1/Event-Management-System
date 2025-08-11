@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: event_management_web
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - FLASK_ENV=development
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_NAME=ems
+    volumes:
+      - .:/app
+    command: python app.py  # ensure Flask runs inside the container
+
+  db:
+    image: mysql:8.0
+    container_name: event_management_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: ems
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./event_management.sql:/docker-entrypoint-initdb.d/event_management.sql
+
+volumes:
+  mysql_data:
