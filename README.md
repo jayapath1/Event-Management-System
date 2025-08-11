@@ -89,8 +89,3 @@ This will create all the necessary tables like `Events`, `Attendees`, `Venues`, 
    - Password: `ucp123`
 2. View the list of events, and click on any event for detailed information.
 3. Logout using the button in the header.
-
-## 🛠️ Contributions
-Feel free to fork this repository and make improvements. Pull requests are always welcome! 😊
-
----
