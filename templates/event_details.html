@@ -46,34 +46,7 @@
         <p><strong>Email:</strong> {{organizer['Email'] }}</p>
 
         <h2>Attendees</h2>
-        <ul>
-            {% for attendee in attendees %}
-                <li>
-                    <p><strong>Name:</strong> {{ attendee['FirstName'] }} {{ attendee['LastName'] }}</p>
-                    <p><strong>Email:</strong> {{ attendee['Email'] }}</p>
-                    <p><strong>Contact Number:</strong> {{ attendee['ContactNumber'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Registrations</h2>
-        <ul>
-            {% for registration in registrations %}
-                <li>
-                    <p><strong>Attendee:</strong> {{ registration['AttendeeID']['FirstName'] }} {{ registration['AttendeeID']['LastName'] }}</p>
-                    <p><strong>Registration Date:</strong> {{ registration['RegistrationDate'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Event Categories</h2>
-        <ul>
-            {% for category in categories %}
-                <li>
-                    <p><strong>Category:</strong> {{ category['CategoryName'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
+        <p>Total attendees: {{ attendees|length }}</p>
 
         <h2>Sessions</h2>
         <ul>
@@ -98,76 +71,14 @@
             {% endfor %}
         </ul>
 
-        <h2>Feedback</h2>
+        <h2>Sponsors</h2>
         <ul>
-            {% for feedback in feedbacks %}
+            {% for sponsor in sponsors %}
                 <li>
-                    <p><strong>Attendee:</strong> {{ feedback['AttendeeID']['FirstName'] }} {{ feedback['AttendeeID']['LastName'] }}</p>
-                    <p><strong>Rating:</strong> {{ feedback['Rating'] }}</p>
-                    <p><strong>Comments:</strong> {{ feedback['Comments'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Tasks</h2>
-        <ul>
-            {% for task in tasks %}
-                <li>
-                    <p><strong>Description:</strong> {{ task['Description'] }}</p>
-                    <p><strong>Deadline:</strong> {{ task['Deadline'] }}</p>
-                    <p><strong>Status:</strong> {{ task['Status'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Payments</h2>
-        <ul>
-            {% for payment in payments %}
-                <li>
-                    <p><strong>Attendee:</strong> {{ payment['AttendeeID']['FirstName'] }} {{ payment['AttendeeID']['LastName'] }}</p>
-                    <p><strong>Amount:</strong> ${{ payment['Amount'] }}</p>
-                    <p><strong>Payment Date:</strong> {{ payment['PaymentDate'] }}</p>
-                    <p><strong>Status:</strong> {{ payment['Status'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Transportation</h2>
-        <ul>
-            {% for transport in transportation %}
-                <li>
-                    <p><strong>Mode:</strong> {{ transport['Mode'] }}</p>
-                    <p><strong>Departure Point:</strong> {{ transport['DeparturePoint'] }}</p>
-                    <p><strong>Arrival Point:</strong> {{ transport['ArrivalPoint'] }}</p>
-                    <p><strong>Departure Time:</strong> {{ transport['DepartureTime'] }}</p>
-                    <p><strong>Arrival Time:</strong> {{ transport['ArrivalTime'] }}</p>
-                    <p><strong>Cost:</strong> ${{ transport['Cost'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Accommodations</h2>
-        <ul>
-            {% for accommodation in accommodations %}
-                <li>
-                    <p><strong>Name:</strong> {{ accommodation['Name'] }}</p>
-                    <p><strong>Location:</strong> {{ accommodation['Location'] }}</p>
-                    <p><strong>Check-In Date:</strong> {{ accommodation['CheckInDate'] }}</p>
-                    <p><strong>Check-Out Date:</strong> {{ accommodation['CheckOutDate'] }}</p>
-                    <p><strong>Cost Per Night:</strong> ${{ accommodation['CostPerNight'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Exhibitors</h2>
-        <ul>
-            {% for exhibitor in exhibitors %}
-                <li>
-                    <p><strong>Exhibitor Name:</strong> {{ exhibitor['ExhibitorName'] }}</p>
-                    <p><strong>Booth Number:</strong> {{ exhibitor['BoothNumber'] }}</p>
-                    <p><strong>Contact Person:</strong> {{ exhibitor['ContactPerson'] }}</p>
-                    <p><strong>Contact Number:</strong> {{ exhibitor['ContactNumber'] }}</p>
-                    <p><strong>Email:</strong> {{ exhibitor['Email'] }}</p>
+                    <p><strong>Name:</strong> {{ sponsor['SponsorName'] }}</p>
+                    <p><strong>Contribution:</strong> ${{ sponsor['Contribution'] }}</p>
+                    <p><strong>Contact Person:</strong> {{ sponsor['ContactPerson'] }}</p>
+                    <p><strong>Contact Number:</strong> {{ sponsor['ContactNumber'] }}</p>
                 </li>
             {% endfor %}
         </ul>
@@ -183,33 +94,8 @@
             {% endfor %}
         </ul>
 
-        <h2>Security</h2>
-        <ul>
-            {% for security in security %}
-                <li>
-                    <p><strong>Security Company:</strong> {{ security['SecurityCompany'] }}</p>
-                    <p><strong>Contact Person:</strong> {{ security['ContactPerson'] }}</p>
-                    <p><strong>Contact Number:</strong> {{ security['ContactNumber'] }}</p>
-                    <p><strong>Access Control Details:</strong> {{ security['AccessControlDetails'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Catering</h2>
-        <ul>
-            {% for catering in catering %}
-                <li>
-                    <p><strong>Catering Company:</strong> {{ catering['CateringCompany'] }}</p>
-                    <p><strong>Contact Person:</strong> {{ catering['ContactPerson'] }}</p>
-                    <p><strong>Contact Number:</strong> {{ catering['ContactNumber'] }}</p>
-                    <p><strong>Menu Details:</strong> {{ catering['MenuDetails'] }}</p>
-                    <p><strong>Cost:</strong> ${{ catering['Cost'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
     </section>
-    <a href="{{ url_for('index') }}">Back to Events</a>
+    <a href="{{ url_for('index') }}" class="back-button">← Back to Events</a>
 </body>
 
 </html>
