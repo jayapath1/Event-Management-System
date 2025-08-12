@@ -137,7 +137,7 @@ nav {
     margin: 4px 0;
 }
 
-a.back-button {
+.back-button {
     display: inline-block;
     margin: 32px auto;
     background-color: #b17e5a;
@@ -145,10 +145,11 @@ a.back-button {
     font-weight: 600;
     padding: 12px 32px;
     border-radius: 8px;
+    text-decoration: none;
     transition: background-color 0.3s ease;
 }
 
-a.back-button:hover {
+.back-button:hover {
     background-color: #8a5c3c;
 }
 
