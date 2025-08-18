@@ -18,6 +18,7 @@ The **Event Management System (EMS)** is a web application built using **Flask**
 Event-Management-System/
 │
 ├── app.py                # Main Flask application
+├── requirements.txt
 ├── static/
 │   ├── style.css         # Main CSS file
 │   └── styles.css        # Additional CSS file
@@ -26,7 +27,11 @@ Event-Management-System/
 │   ├── login.html        # Login page
 │   ├── error.html        # Error page
 │   └── event_details.html# Detailed event page
-└── event_management.sql  # SQL script to set up MySQL database
+├── ems.sql  # SQL script to set up MySQL database
+├── architecture_before.png
+├── architecture_after.png
+├── Dockerfile
+├── docker-compose.yml
 ```
 
 ## Prerequisites

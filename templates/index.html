@@ -25,25 +25,24 @@
 
     {% if events %}
     <div class="events-container">
-    {% for event in events %}
-    <div class="event-card">
-        <h2>{{ event['EventName'] }}</h2>
-        <div class="event-summary">
-            <p><strong>Date:</strong> {{ event['EventDate'] }}</p>
-            <p><strong>Time:</strong> {{ event['StartTime'] }} - {{ event['EndTime'] }}</p>
-            <p><strong>Status:</strong> {{ event['Status'] }}</p>
-        </div>
+        {% for event in events %}
+        <div class="event-card">
+            <h2>{{ event['EventName'] }}</h2>
+            <div class="event-summary">
+                <p><strong>Date:</strong> {{ event['EventDate'] }}</p>
+                <p><strong>Time:</strong> {{ event['StartTime'] }} - {{ event['EndTime'] }}</p>
+                <p><strong>Status:</strong> {{ event['Status'] }}</p>
+            </div>
+            <div class="card-buttons">
+                <button class="event-details-toggle" onclick="toggleDetails(this)">View Details</button>
+            </div>
 
-        <div class="card-buttons">
-            <button class="event-details-toggle" onclick="toggleDetails(this)">View Details</button>
+            <div class="event-details-content">
+                <p><strong>Description:</strong> {{ event['Description'] }}</p>
+                <p><strong>Budget:</strong> ${{ event['Budget'] }}</p>
+                <a href="{{ url_for('event_details', event_id=event['EventID']) }}" class="view-details-btn">Show More</a>
+            </div>
         </div>
-
-        <div class="event-details-content">
-            <p><strong>Description:</strong> {{ event['Description'] }}</p>
-            <p><strong>Budget:</strong> ${{ event['Budget'] }}</p>
-            <a href="{{ url_for('event_details', event_id=event['EventID']) }}" class="view-details-btn">Show More</a>
-        </div>
-    </div>
         {% endfor %}
     </div>
     {% else %}
@@ -62,7 +61,6 @@
     }
 }
 </script>
-
 </body>
 
 </html>
