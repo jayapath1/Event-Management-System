@@ -23,6 +23,12 @@
         {% endif %}
     </nav>
 
+    <div class="sidebar">
+        <button class="add-event-btn" onclick="window.location.href='{{ url_for('add_event') }}'">
+            ＋ Add New Event
+        </button>
+    </div>
+
     {% if events %}
     <div class="events-container">
         {% for event in events %}

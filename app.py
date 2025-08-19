@@ -232,6 +232,27 @@ def event_details_json(event_id):
     except pymysql.Error as e:
         print(f"Error fetching event details: {e}")
         return jsonify({'error': str(e)})
+    
+@app.route('/add_event', methods=['GET', 'POST'])
+def add_event():
+    if request.method == 'POST':
+        event_name = request.form['name']
+        event_date = request.form['date']
+        event_location = request.form['location']
+        
+        try:
+            with create_db_connection() as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "INSERT INTO Events (EventName, EventDate, Location) VALUES (%s, %s, %s)",
+                        (event_name, event_date, event_location)
+                    )
+                connection.commit()
+            return redirect(url_for('index'))
+        except pymysql.Error as e:
+            return render_template('error.html', error_message=str(e))
+    
+    return render_template('add_event.html')
 
 @app.errorhandler(Exception)
 def handle_exception(e):
