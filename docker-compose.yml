@@ -18,7 +18,7 @@ services:
     container_name: event_management_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_ROOT_PASSWORD: jayapath
       MYSQL_DATABASE: EMS
     volumes:
       - mysql_data:/var/lib/mysql

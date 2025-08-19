@@ -232,7 +232,7 @@ def event_details_json(event_id):
     except pymysql.Error as e:
         print(f"Error fetching event details: {e}")
         return jsonify({'error': str(e)})
-    
+
 @app.route('/add_event', methods=['GET', 'POST'])
 def add_event():
     if request.method == 'POST':
@@ -260,4 +260,4 @@ def handle_exception(e):
     return render_template('error.html', error_message=str(e))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
