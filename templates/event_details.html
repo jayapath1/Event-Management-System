@@ -1,101 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>{{ events['EventName'] }} - Event Details</title>
-</head>
-
-<body>
-    <header>
-        <h1>{{ events['EventName'] }}</h1>
-    </header>
-
-    <nav>
-        {% if not session.logged_in %}
-            <a href="{{ url_for('login') }}">Login</a>
-        {% else %}
-            <div class="logout-container">
-                <button class="logout-btn" onclick="window.location.href='/logout'">&#128274; Logout</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <title>{{ events['EventName'] }} - Event Details</title>
+    </head>
+        
+        <body>
+            <header>
+                <h1>{{ events['EventName'] }}</h1>
+            </header>
+            <nav>
+                {% if not session.logged_in %}
+                <a href="{{ url_for('login') }}">Login</a>
+                {% else %}
+                <div class="logout-container">
+                    <button class="logout-btn" onclick="window.location.href='/logout'">&#128274; Logout</button>
+                </div>
+                {% endif %}
+            </nav>
+            
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'overview')">Overview</button>
+                <button class="tab-button" onclick="openTab(event, 'live-reactions')">Live Reactions</button>
+                <button class="tab-button" onclick="openTab(event, 'vr-status')">VR Event Status</button>
+                <button class="tab-button" onclick="openTab(event, 'more-info')">More Info</button>
             </div>
-        {% endif %}
-    </nav>
+            
+            <section id="overview" class="tab-content active">
+                <h2>Event Information</h2>
+                <p><strong>Date:</strong> {{ events['EventDate'] }}</p>
+                <p><strong>Time:</strong> {{ events['StartTime'] }} - {{ events['EndTime'] }}</p>
+                <p><strong>Description:</strong> {{ events['Description'] }}</p>
+                <p><strong>Status:</strong> {{ events['Status'] }}</p>
+                <p><strong>Budget:</strong> ${{ events['Budget'] }}</p>
+                
+                <h2>Venue Details</h2>
+                <p><strong>Venue:</strong> {{ venues['VenueName'] }}</p>
+                <p><strong>Capacity:</strong> {{ venues['Capacity'] }}</p>
+                <p><strong>Location:</strong> {{ venues['Location'] }}</p>
+            </section>
+            
+            <section id="live-reactions" class="tab-content">
+                <h2>Live Reactions</h2>
+                <div id="mastodon-feed">
+                    <p>Loading live reactions from Mastodon...</p>
+                </div>
+            </section>
+            
+            <section id="vr-status" class="tab-content">
+                <h2>VR Event Status</h2>
+                <p>Current VR status of this event:</p>
+                <div id="vr-status-panel">
+                    <p>Loading VR event details...</p>
+                </div>
+            </section>
+            
+            <section id="more-info" class="tab-content">
+                <h2>Organizer</h2>
+                <p><strong>Name:</strong> {{organizer['OrganizerName']}}</p>
+                <p><strong>Contact:</strong> {{organizer['ContactPerson'] }} - {{organizer['ContactNumber'] }}</p>
+                <p><strong>Email:</strong> {{organizer['Email'] }}</p>
+                
+                <h2>Attendees</h2>
+                <p>Total attendees: {{ attendees|length }}</p>
 
-    <section class="event-details">
+                <h2>Sessions</h2>
+                <ul>
+                    {% for session in sessions %}
+                    <li>{{ session['Title'] }} by {{ session['SpeakerID']['SpeakerName'] }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h2>Speakers</h2>
+                <ul>
+                    {% for speaker in speakers %}
+                    <li>{{ speaker['SpeakerName'] }} - {{ speaker['Bio'] }}</li>
+                    {% endfor %}
+                </ul>
 
-        <h2>Event Information</h2>
-        <p><strong>Date:</strong> {{ events['EventDate'] }}</p>
-        <p><strong>Time:</strong> {{ events['StartTime'] }} - {{ events['EndTime'] }}</p>
-        <p><strong>Description:</strong> {{ events['Description'] }}</p>
-        <p><strong>Status:</strong> {{ events['Status'] }}</p>
-        <p><strong>Budget:</strong> ${{ events['Budget'] }}</p>
+                <h2>Sponsors</h2>
+                <ul>
+                    {% for sponsor in sponsors %}
+                    <li>{{ sponsor['SponsorName'] }} - ${{ sponsor['Contribution'] }}</li>
+                    {% endfor %}
+                </ul>
 
-        <h2>Venue Details</h2>
-        <p><strong>Venue:</strong> {{ venues['VenueName'] }}</p>
-        <p><strong>Capacity:</strong> {{ venues['Capacity'] }}</p>
-        <p><strong>Location:</strong> {{ venues['Location'] }}</p>
-        <p><strong>Contact Person:</strong> {{ venues['ContactPerson'] }}</p>
-        <p><strong>Contact Number:</strong> {{ venues['ContactNumber'] }}</p>
-
-        <h2>Organizer Details</h2>
-        <p><strong>Organizer:</strong> {{organizer['OrganizerName'] }}</p>
-        <p><strong>Contact Person:</strong> {{organizer['ContactPerson'] }}</p>
-        <p><strong>Contact Number:</strong> {{organizer['ContactNumber'] }}</p>
-        <p><strong>Email:</strong> {{organizer['Email'] }}</p>
-
-        <h2>Attendees</h2>
-        <p>Total attendees: {{ attendees|length }}</p>
-
-        <h2>Sessions</h2>
-        <ul>
-            {% for session in sessions %}
-                <li>
-                    <p><strong>Title:</strong> {{ session['Title'] }}</p>
-                    <p><strong>Speaker:</strong> {{ session['SpeakerID']['SpeakerName'] }}</p>
-                    <p><strong>Start Time:</strong> {{ session['StartTime'] }}</p>
-                    <p><strong>End Time:</strong> {{ session['EndTime'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Speakers</h2>
-        <ul>
-            {% for speaker in speakers %}
-                <li>
-                    <p><strong>Name:</strong> {{ speaker['SpeakerName'] }}</p>
-                    <p><strong>Bio:</strong> {{ speaker['Bio'] }}</p>
-                    <p><strong>Contact Information:</strong> {{ speaker['ContactInformation'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Sponsors</h2>
-        <ul>
-            {% for sponsor in sponsors %}
-                <li>
-                    <p><strong>Name:</strong> {{ sponsor['SponsorName'] }}</p>
-                    <p><strong>Contribution:</strong> ${{ sponsor['Contribution'] }}</p>
-                    <p><strong>Contact Person:</strong> {{ sponsor['ContactPerson'] }}</p>
-                    <p><strong>Contact Number:</strong> {{ sponsor['ContactNumber'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Social Media Promotions</h2>
-        <ul>
-            {% for promotion in social_media_promotions %}
-                <li>
-                    <p><strong>Platform:</strong> {{ promotion['Platform'] }}</p>
-                    <p><strong>Content:</strong> {{ promotion['Content'] }}</p>
-                    <p><strong>Date Posted:</strong> {{ promotion['DatePosted'] }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-
-    </section>
-    <a href="{{ url_for('index') }}" class="back-button">← Back to Events</a>
-</body>
-
+                <h2>Social Media Promotions</h2>
+                <ul>
+                    {% for promotion in social_media_promotions %}
+                    <li>{{ promotion['Platform'] }}: {{ promotion['Content'] }} ({{ promotion['DatePosted'] }})</li>
+                    {% endfor %}
+                </ul>
+            </section>
+            
+            <a href="{{ url_for('index') }}" class="back-button">← Back to Events</a>
+            
+            <script>
+            function openTab(evt, tabName) {
+                var i, tabcontent, tabbuttons;
+                tabcontent = document.getElementsByClassName("tab-content");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].classList.remove("active");
+                }
+                tabbuttons = document.getElementsByClassName("tab-button");
+                for (i = 0; i < tabbuttons.length; i++) {
+                    tabbuttons[i].classList.remove("active");
+                }
+                document.getElementById(tabName).classList.add("active");
+                evt.currentTarget.classList.add("active");
+                }
+            </script>
+        </body>
 </html>
