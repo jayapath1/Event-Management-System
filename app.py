@@ -235,24 +235,44 @@ def event_details_json(event_id):
 
 @app.route('/add_event', methods=['GET', 'POST'])
 def add_event():
+    try:
+        with create_db_connection() as connection:
+            with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute("SELECT VenueID, VenueName FROM Venues")
+                venues = cursor.fetchall()
+                cursor.execute("SELECT OrganizerID, OrganizerName FROM Organizers")
+                organizers = cursor.fetchall()
+    except pymysql.Error as e:
+        return render_template('error.html', error_message=str(e))
+
     if request.method == 'POST':
-        event_name = request.form['name']
-        event_date = request.form['date']
-        event_location = request.form['location']
-        
+        event_name = request.form['EventName']
+        event_date = request.form['EventDate']
+        venue_id = request.form['VenueID']
+        organizer_id = request.form['OrganizerID']
+        start_time = request.form.get('StartTime')
+        end_time = request.form.get('EndTime')
+        description = request.form.get('Description')
+        status = request.form.get('Status')
+        budget = request.form.get('Budget')
+
         try:
             with create_db_connection() as connection:
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        "INSERT INTO Events (EventName, EventDate, Location) VALUES (%s, %s, %s)",
-                        (event_name, event_date, event_location)
+                        """
+                        INSERT INTO Events 
+                        (EventName, EventDate, StartTime, EndTime, Description, Status, Budget, VenueID, OrganizerID)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """,
+                        (event_name, event_date, start_time, end_time, description, status, budget, venue_id, organizer_id)
                     )
                 connection.commit()
             return redirect(url_for('index'))
         except pymysql.Error as e:
             return render_template('error.html', error_message=str(e))
-    
-    return render_template('add_event.html')
+
+    return render_template('add_event.html', venues=venues, organizers=organizers)
 
 @app.errorhandler(Exception)
 def handle_exception(e):

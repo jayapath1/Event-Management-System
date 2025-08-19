@@ -192,3 +192,132 @@ header h1 {
     font-weight: 700;
 }
 
+.add-event-container {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 1rem;
+}
+
+.add-event-form {
+    background-color: #fffaf3;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    max-width: 600px;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
+.add-event-form fieldset {
+    border: 1px solid #e0d6c9;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    background-color: #fdf8f2;
+}
+
+.add-event-form legend {
+    font-weight: 700;
+    color: #4d3737;
+    padding: 0 0.5rem;
+    font-size: 1.1rem;
+}
+
+.add-event-form label {
+    display: block;
+    margin: 1rem 0 0.5rem;
+    font-weight: 600;
+    color: #4d3737;
+}
+
+.add-event-form input,
+.add-event-form textarea,
+.add-event-form select {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #d1c7b8;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f9f6f1;
+    color: #3b3b3b;
+    margin-bottom: 1rem;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-event-form input:focus,
+.add-event-form textarea:focus,
+.add-event-form select:focus {
+    border-color: #b17e5a;
+    box-shadow: 0 0 0 3px rgba(177, 126, 90, 0.2);
+    outline: none;
+}
+
+.time-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.time-group div {
+    flex: 1;
+}
+
+.submit-btn {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.8rem;
+    background-color: #b17e5a;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: #8a5c3c;
+    transform: scale(1.02);
+}
+
+.back-button {
+    display: inline-block;
+    margin: 2rem auto;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: #b17e5a;
+    border: 2px solid #b17e5a;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #b17e5a;
+    color: #fff;
+}
+
+header h1 {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4d3737;
+}
+
+nav {
+    display: flex;
+    justify-content: flex-end;
+    margin: 1rem 2rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+@media screen and (max-width: 768px) {
+    .add-event-form {
+        padding: 2rem 1.5rem;
+    }
+    .time-group {
+        flex-direction: column;
+    }
+}

@@ -1,35 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Add New Event</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Add New Event</title>
 </head>
+
 <body>
     <header>
         <h1>Add New Event</h1>
     </header>
 
-    <form method="POST" action="{{ url_for('add_event') }}" class="event-form">
-        <label>Event Name:</label>
-        <input type="text" name="name" required>
+    <nav>
+        {% if not session.logged_in %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% else %}
+            <div class="logout-container">
+                <button class="logout-btn" onclick="window.location.href='/logout'">&#128274; Logout</button>
+            </div>
+        {% endif %}
+    </nav>
 
-        <label>Date:</label>
-        <input type="date" name="date" required>
+    <main class="add-event-container">
+        <form action="{{ url_for('add_event') }}" method="POST" class="add-event-form">
+            <fieldset>
+                <legend>Event Information</legend>
+                <label for="name">Event Name</label>
+                <input type="text" id="name" name="EventName" required>
 
-        <label>Start Time:</label>
-        <input type="time" name="start_time" required>
+                <label for="date">Date</label>
+                <input type="date" id="date" name="EventDate" required>
 
-        <label>End Time:</label>
-        <input type="time" name="end_time" required>
+                <label for="start-time">Start Time</label>
+                <input type="time" id="start-time" name="StartTime" required>
 
-        <label>Description:</label>
-        <textarea name="description" rows="4" required></textarea>
+                <label for="end-time">End Time</label>
+                <input type="time" id="end-time" name="EndTime" required>
 
-        <label>Budget ($):</label>
-        <input type="number" name="budget" step="0.01" required>
+                <label for="description">Description</label>
+                <textarea id="description" name="Description" rows="4" required></textarea>
 
-        <button type="submit" class="submit-btn">➕ Add Event</button>
-    </form>
+                <label for="status">Status</label>
+                <select id="status" name="Status" required>
+                    <option value="Planned">Planned</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Completed">Completed</option>
+                </select>
+
+                <label for="budget">Budget ($)</label>
+                <input type="number" id="budget" name="Budget" min="0" step="100">
+            </fieldset>
+
+            <fieldset>
+                <legend>Venue Details</legend>
+                <label for="venue">Venue</label>
+                <select id="venue" name="VenueID" required>
+                    {% for venue in venues %}
+                    <option value="{{ venue.VenueID }}">{{ venue.VenueName }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="capacity">Capacity</label>
+                <input type="number" id="capacity" name="Capacity" min="1" required>
+
+                <label for="location">Location</label>
+                <input type="text" id="location" name="Location" required>
+
+                <label for="contact-person">Contact Person</label>
+                <input type="text" id="contact-person" name="ContactPerson" required>
+
+                <label for="contact-number">Contact Number</label>
+                <input type="tel" id="contact-number" name="ContactNumber" required>
+            </fieldset>
+
+            <fieldset>
+                <label for="organizer">Organizer</label>
+                <select id="organizer" name="OrganizerID" required>
+                    {% for org in organizers %}
+                    <option value="{{ org.OrganizerID }}">{{ org.OrganizerName }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="organizer-contact">Contact Person</label>
+                <input type="text" id="organizer-contact" name="OrganizerContact" required>
+
+                <label for="organizer-phone">Contact Number</label>
+                <input type="tel" id="organizer-phone" name="OrganizerPhone" required>
+
+                <label for="organizer-email">Email</label>
+                <input type="email" id="organizer-email" name="OrganizerEmail" required>
+            </fieldset>
+
+            <button type="submit" class="submit-btn">Add Event</button>
+        </form>
+    </main>
+
+    <a href="{{ url_for('index') }}" class="back-button">← Back to Events</a>
 </body>
+
 </html>
