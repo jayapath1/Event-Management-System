@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   web:
     build: .
@@ -12,6 +11,8 @@ services:
     volumes:
       - .:/app
     command: python app.py
+    networks:
+      - server
 
   db:
     image: mysql:8.0
@@ -23,6 +24,12 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./ems.sql:/docker-entrypoint-initdb.d/ems.sql
+    networks:
+      - server
 
 volumes:
   mysql_data:
+
+networks:
+  server:
+    driver: bridge

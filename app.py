@@ -26,10 +26,11 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = 'db'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'jayapath'
 app.config['MYSQL_DB'] = 'EMS'
+app.config['MYSQL_PORT'] = 3306
 
 def create_db_connection():
     try:
@@ -37,7 +38,8 @@ def create_db_connection():
             host=app.config['MYSQL_HOST'],
             user=app.config['MYSQL_USER'],
             password=app.config['MYSQL_PASSWORD'],
-            db=app.config['MYSQL_DB']
+            db=app.config['MYSQL_DB'],
+            port=app.config["MYSQL_PORT"],
         )
         return connection
     except pymysql.Error as e:

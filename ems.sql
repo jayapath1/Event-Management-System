@@ -437,4 +437,3 @@ VALUES
 
 Show tables;
 
-z
