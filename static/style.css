@@ -331,3 +331,18 @@ nav {
     margin: 1rem 2rem;
     font-family: 'Poppins', sans-serif;
 }
+
+.ticket-form {
+    margin-bottom: 1em;
+}
+.ticket-form input {
+    padding: 0.5em;
+    margin-right: 0.5em;
+}
+.ticket-form button {
+    padding: 0.5em 1em;
+    background: #d4b483;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

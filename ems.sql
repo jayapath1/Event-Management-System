@@ -1,8 +1,9 @@
+DROP DATABASE EMS;
 CREATE SCHEMA EMS;
 USE EMS;
 
 CREATE TABLE Venues (
-    VenueID INT PRIMARY KEY,
+    VenueID INT PRIMARY KEY AUTO_INCREMENT,
     VenueName VARCHAR(255) NOT NULL,
     Capacity INT,
     Location VARCHAR(255),
@@ -11,7 +12,7 @@ CREATE TABLE Venues (
 );
 
 CREATE TABLE Organizers (
-    OrganizerID INT PRIMARY KEY,
+    OrganizerID INT PRIMARY KEY AUTO_INCREMENT,
     OrganizerName VARCHAR(255) NOT NULL,
     ContactPerson VARCHAR(100),
     ContactNumber VARCHAR(20),
@@ -19,7 +20,7 @@ CREATE TABLE Organizers (
 );
 
 CREATE TABLE Events (
-    EventID INT PRIMARY KEY,
+    EventID INT PRIMARY KEY AUTO_INCREMENT,
     EventName VARCHAR(255) NOT NULL,
     EventDate DATE,
     StartTime TIME,
@@ -33,8 +34,16 @@ CREATE TABLE Events (
     FOREIGN KEY (OrganizerID) REFERENCES Organizers(OrganizerID)
 );
 
+CREATE TABLE Tickets (
+    TicketID INT AUTO_INCREMENT PRIMARY KEY,
+    EventID INT NOT NULL,
+    AttendeeName VARCHAR(255) NOT NULL,
+    PurchaseTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (EventID) REFERENCES Events(EventID)
+);
+
 CREATE TABLE Attendees (
-    AttendeeID INT PRIMARY KEY,
+    AttendeeID INT PRIMARY KEY AUTO_INCREMENT,
     FirstName VARCHAR(100) NOT NULL,
     LastName VARCHAR(100) NOT NULL,
     Email VARCHAR(255),
@@ -42,7 +51,7 @@ CREATE TABLE Attendees (
 );
 
 CREATE TABLE Registrations (
-    RegistrationID INT PRIMARY KEY,
+    RegistrationID INT PRIMARY KEY AUTO_INCREMENT,
     EventID INT,
     AttendeeID INT,
     RegistrationDate DATE,
@@ -50,27 +59,22 @@ CREATE TABLE Registrations (
     FOREIGN KEY (AttendeeID) REFERENCES Attendees(AttendeeID)
 );
 
-CREATE TABLE EventCategories (
-    CategoryID INT PRIMARY KEY,
-    CategoryName VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE Speakers (
-    SpeakerID INT PRIMARY KEY,
+    SpeakerID INT PRIMARY KEY AUTO_INCREMENT,
     SpeakerName VARCHAR(255) NOT NULL,
     Bio TEXT,
     ContactInformation VARCHAR(255)
 );
 
 CREATE TABLE Sponsors (
-    SponsorID INT PRIMARY KEY,
+    SponsorID INT PRIMARY KEY AUTO_INCREMENT,
     SponsorName VARCHAR(255) NOT NULL,
     ContactPerson VARCHAR(100),
     ContactNumber VARCHAR(20)
 );
 
 CREATE TABLE Sessions (
-    SessionID INT PRIMARY KEY,
+    SessionID INT PRIMARY KEY AUTO_INCREMENT,
     EventID INT,
     StartTime TIME,
     EndTime TIME,
@@ -81,7 +85,7 @@ CREATE TABLE Sessions (
 );
 
 CREATE TABLE Feedback (
-    FeedbackID INT PRIMARY KEY,
+    FeedbackID INT PRIMARY KEY AUTO_INCREMENT,
     EventID INT,
     AttendeeID INT,
     Rating INT,
@@ -90,60 +94,8 @@ CREATE TABLE Feedback (
     FOREIGN KEY (AttendeeID) REFERENCES Attendees(AttendeeID)
 );
 
-CREATE TABLE Tasks (
-    TaskID INT PRIMARY KEY,
-    EventID INT,
-    Description TEXT,
-    Deadline DATE,
-    Status VARCHAR(50),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID)
-);
-
-CREATE TABLE Payments (
-    PaymentID INT PRIMARY KEY,
-    AttendeeID INT,
-    Amount DECIMAL(10, 2),
-    PaymentDate DATE,
-    Status VARCHAR(50),
-    FOREIGN KEY (AttendeeID) REFERENCES Attendees(AttendeeID)
-);
-
-CREATE TABLE Transportation (
-    TransportID INT PRIMARY KEY,
-    EventID INT,
-    Mode VARCHAR(50),
-    DeparturePoint VARCHAR(255),
-    ArrivalPoint VARCHAR(255),
-    DepartureTime DATETIME,
-    ArrivalTime DATETIME,
-    Cost DECIMAL(10, 2),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID)
-);
-
-CREATE TABLE Accommodations (
-    AccommodationID INT PRIMARY KEY,
-    EventID INT,
-    Name VARCHAR(255),
-    Location VARCHAR(255),
-    CheckInDate DATE,
-    CheckOutDate DATE,
-    CostPerNight DECIMAL(10, 2),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID)
-);
-
-CREATE TABLE Exhibitors (
-    ExhibitorID INT PRIMARY KEY,
-    EventID INT,
-    ExhibitorName VARCHAR(255),
-    BoothNumber VARCHAR(50),
-    ContactPerson VARCHAR(100),
-    ContactNumber VARCHAR(20),
-    Email VARCHAR(255),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID)
-);
-
 CREATE TABLE SocialMediaPromotion (
-    PromotionID INT PRIMARY KEY,
+    PromotionID INT PRIMARY KEY AUTO_INCREMENT,
     EventID INT,
     Platform VARCHAR(50),
     Content TEXT,
@@ -151,88 +103,21 @@ CREATE TABLE SocialMediaPromotion (
     FOREIGN KEY (EventID) REFERENCES Events(EventID)
 );
 
-CREATE TABLE Security (
-    SecurityID INT PRIMARY KEY,
-    EventID INT,
-    SecurityCompany VARCHAR(255),
-    ContactPerson VARCHAR(100),
-    ContactNumber VARCHAR(20),
-    AccessControlDetails TEXT,
-    FOREIGN KEY (EventID) REFERENCES Events(EventID)
-);
-
-CREATE TABLE Catering (
-    CateringID INT PRIMARY KEY,
-    EventID INT,
-    CateringCompany VARCHAR(255),
-    ContactPerson VARCHAR(100),
-    ContactNumber VARCHAR(20),
-    MenuDetails TEXT,
-    Cost DECIMAL(10, 2),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID)
-);
-
-CREATE TABLE EventCategoriesMapping 
-(
-    EventID INT,
-    CategoryID INT,
-    PRIMARY KEY (EventID, CategoryID),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    FOREIGN KEY (CategoryID) REFERENCES EventCategories(CategoryID)
-);
-
-CREATE TABLE AttendeeSessions
-(
+CREATE TABLE Payments (
+    PaymentID INT PRIMARY KEY AUTO_INCREMENT,
     AttendeeID INT,
-    SessionID INT,
-    PRIMARY KEY (AttendeeID, SessionID),
-    FOREIGN KEY (AttendeeID) REFERENCES Attendees(AttendeeID),
-    FOREIGN KEY (SessionID) REFERENCES Sessions(SessionID)
+    Amount DECIMAL(10,2),
+    PaymentDate DATE,
+    Status VARCHAR(50),
+    FOREIGN KEY (AttendeeID) REFERENCES Attendees(AttendeeID)
 );
 
-CREATE TABLE EventExhibitors
-(
-    EventID INT,
-    ExhibitorID INT,
-    PRIMARY KEY (EventID, ExhibitorID),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    FOREIGN KEY (ExhibitorID) REFERENCES Exhibitors(ExhibitorID)
-);
-
-CREATE TABLE EventSecurity
- (
-    EventID INT,
-    SecurityID INT,
-    PRIMARY KEY (EventID, SecurityID),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    FOREIGN KEY (SecurityID) REFERENCES Security(SecurityID)
-);
-
-CREATE TABLE EventSpeakers
-(
-    EventID INT,
-    SpeakerID INT,
-    PRIMARY KEY (EventID, SpeakerID),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    FOREIGN KEY (SpeakerID) REFERENCES Speakers(SpeakerID)
-);
-
-CREATE TABLE EventPayments 
-(
+CREATE TABLE EventPayments (
     EventID INT,
     PaymentID INT,
-    PRIMARY KEY (EventID, PaymentID),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    FOREIGN KEY (PaymentID) REFERENCES Payments(PaymentID)
-);
-
-CREATE TABLE EventCatering
-(
-    EventID INT,
-    CateringID INT,
-    PRIMARY KEY (EventID, CateringID),
-    FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    FOREIGN KEY (CateringID) REFERENCES Catering(CateringID)
+    PRIMARY KEY(EventID, PaymentID),
+    FOREIGN KEY(EventID) REFERENCES Events(EventID),
+    FOREIGN KEY(PaymentID) REFERENCES Payments(PaymentID)
 );
 
 INSERT INTO Venues (VenueID, VenueName, Capacity, Location, ContactPerson, ContactNumber)
@@ -275,14 +160,6 @@ VALUES
     (4, 3, 4, '2024-01-04'),
     (5, 4, 5, '2024-01-05');
 
-INSERT INTO EventCategories (CategoryID, CategoryName)
-VALUES
-    (1, 'Conference'),
-    (2, 'Seminar'),
-    (3, 'Workshop'),
-    (4, 'Exhibition'),
-    (5, 'Networking Event');
-
 INSERT INTO Speakers (SpeakerID, SpeakerName, Bio, ContactInformation)
 VALUES
     (1, 'Dr. Ayesha Khan', 'Renowned researcher in technology', '+92 300 1112222'),
@@ -315,46 +192,6 @@ VALUES
     (4, 3, 4, 4, 'Loved the seminar, insightful content'),
     (5, 4, 5, 5, 'Innovation showcase was amazing');
 
-INSERT INTO Tasks (TaskID, EventID, Description, Deadline, Status)
-VALUES
-    (1, 1, 'Prepare event materials', '2024-01-10', 'In Progress'),
-    (2, 2, 'Coordinate panel discussion logistics', '2024-01-15', 'Not Started'),
-    (3, 3, 'Set up workshop venue', '2024-01-12', 'Completed'),
-    (4, 4, 'Organize seminar sessions', '2024-01-18', 'In Progress'),
-    (5, 5, 'Plan innovation showcase', '2024-01-20', 'Not Started');
-
-INSERT INTO Payments (PaymentID, AttendeeID, Amount, PaymentDate, Status)
-VALUES
-    (1, 1, 100.00, '2024-01-02', 'Paid'),
-    (2, 2, 150.00, '2024-01-03', 'Paid'),
-    (3, 3, 80.00, '2024-01-05', 'Pending'),
-    (4, 4, 120.00, '2024-01-08', 'Paid'),
-    (5, 5, 200.00, '2024-01-10', 'Pending');
-
-INSERT INTO Transportation (TransportID, EventID, Mode, DeparturePoint, ArrivalPoint, DepartureTime, ArrivalTime, Cost)
-VALUES
-    (1, 1, 'Bus', 'Lahore', 'Islamabad', '2024-01-15 08:00:00', '2024-01-15 12:00:00', 500.00),
-    (2, 2, 'Car', 'Lahore', 'Karachi', '2024-02-01 10:00:00', '2024-02-01 18:00:00', 1000.00),
-    (3, 3, 'Train', 'Lahore', 'Faisalabad', '2024-02-10 14:00:00', '2024-02-10 16:00:00', 300.00),
-    (4, 4, 'Flight', 'Lahore', 'Quetta', '2024-02-20 12:00:00', '2024-02-20 16:00:00', 1200.00),
-    (5, 5, 'Bus', 'Lahore', 'Multan', '2024-03-01 09:00:00', '2024-03-01 13:00:00', 400.00);
-
-INSERT INTO Accommodations (AccommodationID, EventID, Name, Location, CheckInDate, CheckOutDate, CostPerNight)
-VALUES
-    (1, 1, 'Luxury Hotel', 'Lahore', '2024-01-15', '2024-01-17', 150.00),
-    (2, 2, 'Beach Resort', 'Karachi', '2024-02-01', '2024-02-03', 200.00),
-    (3, 3, 'City Inn', 'Faisalabad', '2024-02-10', '2024-02-11', 80.00),
-    (4, 4, 'Quetta Lodge', 'Quetta', '2024-02-20', '2024-02-22', 100.00),
-    (5, 5, 'Multan Guest House', 'Multan', '2024-03-01', '2024-03-02', 120.00);
-
-INSERT INTO Exhibitors (ExhibitorID, EventID, ExhibitorName, BoothNumber, ContactPerson, ContactNumber, Email)
-VALUES
-    (1, 1, 'Tech Expo', 'Booth A1', 'Ahmed Khan', '+92 300 1113344', 'ahmed@example.com'),
-    (2, 2, 'Finance Solutions', 'Booth B2', 'Sara Ali', '+92 321 2224455', 'sara@example.com'),
-    (3, 3, 'GreenTech Innovations', 'Booth C3', 'Ali Raza', '+92 333 3335566', 'ali@example.com'),
-    (4, 4, 'Digital Marketing Hub', 'Booth D4', 'Nida Shah', '+92 345 4446677', 'nida@example.com'),
-    (5, 5, 'AI Tech', 'Booth E5', 'Bilal Ahmed', '+92 302 5557788', 'bilal@example.com');
-
 INSERT INTO SocialMediaPromotion (PromotionID, EventID, Platform, Content, DatePosted)
 VALUES
     (1, 1, 'Twitter', 'Exciting tech conference coming up in Lahore! #TechExpo', '2024-01-05'),
@@ -363,71 +200,7 @@ VALUES
     (4, 4, 'LinkedIn', 'Digital Marketing Showcase in Quetta. Connect with experts!', '2024-02-20'),
     (5, 5, 'Twitter', 'AI Innovation event in Multan. Explore the future!', '2024-03-01');
 
-INSERT INTO Security (SecurityID, EventID, SecurityCompany, ContactPerson, ContactNumber, AccessControlDetails)
-VALUES
-    (1, 1, 'SecureGuard Services', 'Ali Khan', '+92 300 1114455', 'Strict access control at all entry points'),
-    (2, 2, 'SafeEvent Solutions', 'Sara Ahmed', '+92 321 2226677', '24/7 surveillance and emergency response'),
-    (3, 3, 'GreenSecure', 'Ahmed Raza', '+92 333 3338899', 'Eco-friendly security practices'),
-    (4, 4, 'DigitalSafe', 'Nida Fatima', '+92 345 4441122', 'Secure digital access to event areas'),
-    (5, 5, 'AI Security Solutions', 'Bilal Khan', '+92 302 5553344', 'Artificial intelligence-powered surveillance');
-
-INSERT INTO Catering (CateringID, EventID, CateringCompany, ContactPerson, ContactNumber, MenuDetails, Cost)
-VALUES
-    (1, 1, 'FoodFiesta Caterers', 'Ali Khan', '+92 300 1117788', 'Buffet with a variety of cuisines', 2000.00),
-    (2, 2, 'TasteBuds Catering', 'Sara Ahmed', '+92 321 2229900', 'Customized menu for the seminar', 1500.00),
-    (3, 3, 'GreenEats Catering', 'Ahmed Raza', '+92 333 3331122', 'Sustainable and healthy food options', 1800.00),
-    (4, 4, 'DigitalDine Catering', 'Nida Fatima', '+92 345 4443344', 'Digital-themed menu for the showcase', 2200.00),
-    (5, 5, 'AICuisine Caterers', 'Bilal Khan', '+92 302 5555566', 'AI-curated menu for the innovation event', 2500.00);
-
-INSERT INTO EventCategoriesMapping (EventID, CategoryID)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5);
-
-INSERT INTO AttendeeSessions (AttendeeID, SessionID)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5);
-
-INSERT INTO EventExhibitors (EventID, ExhibitorID)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5);
-
-INSERT INTO EventSecurity (EventID, SecurityID)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5);
-
-INSERT INTO EventSpeakers (EventID, SpeakerID)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5);
-
 INSERT INTO EventPayments (EventID, PaymentID)
-VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5);
-
-INSERT INTO EventCatering (EventID, CateringID)
 VALUES
     (1, 1),
     (2, 2),
