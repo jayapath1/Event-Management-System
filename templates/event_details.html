@@ -99,15 +99,18 @@
                     <li>{{ promotion['Platform'] }}: {{ promotion['Content'] }} ({{ promotion['DatePosted'] }})</li>
                     {% endfor %}
                 </ul>
-                                
+            </section>
+                
+            <section id="tickets" class="tab-content">
                 <h2>Tickets</h2>
                 <form action="{{ url_for('buy_ticket', event_id=events['EventID']) }}" method="POST" class="ticket-form">
                     <label for="attendee_name">Your Name:</label>
                     <input type="text" id="attendee_name" name="attendee_name" required>
                     <button type="submit">Buy Ticket</button>
                 </form>
+
                 <h3>Attendees ({{ tickets|length }})</h3>
-                <ul>
+                <ul id="ticketList">
                     {% for ticket in tickets %}
                     <li>{{ ticket.attendee_name }} (purchased: {{ ticket.purchase_time }})</li>
                     {% else %}
@@ -115,6 +118,49 @@
                     {% endfor %}
                 </ul>
             </section>
+
+            <script>
+            document.getElementById("ticketForm").addEventListener("submit", async function(e) {
+                e.preventDefault();
+                const attendeeName = document.getElementById("attendeeName").value;
+                const eventId = {{ events.EventID }};
+                
+                try {
+                    const response = await fetch("/tickets", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                     },
+                    body: JSON.stringify({
+                        event_id: eventId,
+                        attendee_name: attendeeName
+                    })
+             });
+
+                if (response.ok) {
+                    alert("Ticket purchased!");
+                    document.getElementById("attendeeName").value = "";
+
+                    const ticketsResponse = await fetch(`/events/${eventId}/tickets`);
+                    const tickets = await ticketsResponse.json();
+
+                    const ticketList = document.getElementById("ticketList");
+                    ticketList.innerHTML = "";
+                    tickets.forEach(ticket => {
+                        const li = document.createElement("li");
+                        li.textContent = ticket.AttendeeName;
+                        ticketList.appendChild(li);
+                    });
+                } else {
+                    const err = await response.json();
+                    alert("Error buying ticket: " + err.error);
+                }
+            } catch (error) {
+                console.error("Unexpected error:", error);
+                alert("An unexpected error occurred.");
+            }
+        });
+    </script>
             
             <a href="{{ url_for('index') }}" class="back-button">← Back to Events</a>
             

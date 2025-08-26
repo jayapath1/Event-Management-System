@@ -1,5 +1,3 @@
-# scripts/simulate_tickets.py
-
 from faker import Faker
 import pymysql
 import random
@@ -8,7 +6,7 @@ import random
 # Configuration
 # -----------------------
 DB_CONFIG = {
-    'host': 'localhost',    # or 'db' if using Docker
+    'host': 'localhost',
     'user': 'root',
     'password': 'jayapath',
     'db': 'EMS',
