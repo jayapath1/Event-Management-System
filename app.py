@@ -3,7 +3,8 @@ import pymysql
 
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'
-    
+
+# -------------------- LOGIN / LOGOUT --------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error_message = None
@@ -25,6 +26,7 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# -------------------- DATABASE CONFIG --------------------
 app.config['MYSQL_HOST'] = 'db'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'jayapath'
@@ -45,6 +47,7 @@ def create_db_connection():
         print(f"Error connecting to MySQL: {e}")
         raise e
 
+# -------------------- INDEX / EVENTS --------------------
 @app.route('/')
 def index():
     if 'logged_in' not in session or not session['logged_in']:
@@ -65,42 +68,49 @@ def event_details(event_id):
     try:
         with create_db_connection() as connection:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute(f"SELECT * FROM Events where EventID = {event_id}")
+                cursor.execute("SELECT * FROM Events WHERE EventID=%s", (event_id,))
                 event = cursor.fetchone()
+                cursor.execute("SELECT * FROM Tickets WHERE EventID=%s", (event_id,))
+                tickets = cursor.fetchall()
 
-                if event:
-                    venues = fetch_venue_details(connection)
-                    organizer = fetch_organizer_details(connection)
-                    attendees = fetch_attendees(connection)
-                    registrations = fetch_registrations(connection)
-                    sessions = fetch_sessions(connection)
-                    speakers = fetch_speakers(connection)
-                    feedbacks = fetch_feedbacks(connection)
-                    social_media_promotions = fetch_social_media_promotions(connection)
+            if not event:
+                return render_template('event_details.html', event={})
 
-                    with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                        cursor.execute("SELECT * FROM Tickets WHERE EventID=%s", (event_id,))
-                        tickets = cursor.fetchall()
+            venues = fetch_venue_details(connection)
+            organizer = fetch_organizer_details(connection)
+            attendees = fetch_attendees(connection)
+            registrations = fetch_registrations(connection)
+            sessions = fetch_sessions(connection)
+            speakers = fetch_speakers(connection)
+            feedbacks = fetch_feedbacks(connection)
+            social_media_promotions = fetch_social_media_promotions(connection)
 
-                    return render_template('event_details.html', events=event, venues=venues, organizer=organizer,
-                                           attendees=attendees, registrations=registrations,
-                                           sessions=sessions,
-                                           speakers=speakers, feedbacks=feedbacks,
-                                           social_media_promotions=social_media_promotions, tickets=tickets)
-                else:
-                    return render_template('event_details.html', event={})
+        return render_template(
+            'event_details.html',
+            events=event,
+            venues=venues,
+            organizer=organizer,
+            attendees=attendees,
+            tickets=tickets,
+            registrations=registrations,
+            sessions=sessions,
+            speakers=speakers,
+            feedbacks=feedbacks,
+            social_media_promotions=social_media_promotions,
+        )
     except pymysql.Error as e:
         print(f"Error fetching event details: {e}")
         return render_template('error.html', error_message=str(e))
 
+# -------------------- FETCH HELPERS --------------------
 def fetch_venue_details(connection):
     with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM Venues limit 1")
+        cursor.execute("SELECT * FROM Venues LIMIT 1")
         return cursor.fetchone()
-    
+
 def fetch_organizer_details(connection):
     with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM Organizers limit 1")
+        cursor.execute("SELECT * FROM Organizers LIMIT 1")
         return cursor.fetchone()
 
 def fetch_attendees(connection):
@@ -128,48 +138,12 @@ def fetch_feedbacks(connection):
         cursor.execute("SELECT * FROM Feedback")
         return cursor.fetchall()
 
-
 def fetch_social_media_promotions(connection):
     with connection.cursor(pymysql.cursors.DictCursor) as cursor:
         cursor.execute("SELECT * FROM SocialMediaPromotion")
         return cursor.fetchall()
 
-@app.route('/event_details/<int:event_id>/json')
-def event_details_json(event_id):
-    try:
-        with create_db_connection() as connection:
-            with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("SELECT * FROM Events limit 1")
-                event = cursor.fetchone()
-
-                if event:
-                    venues = fetch_venue_details(connection)
-                    organizer = fetch_organizer_details(connection)
-                    attendees = fetch_attendees(connection)
-                    registrations = fetch_registrations(connection)
-                    sessions = fetch_sessions(connection)
-                    speakers = fetch_speakers(connection)
-                    feedbacks = fetch_feedbacks(connection)
-                    social_media_promotions = fetch_social_media_promotions(connection)
-
-                    event_dict = {
-                        'EventDetails': event,
-                        'VenueDetails':venues,
-                        'OrganizerDetails': organizer,
-                        'Attendees': attendees,
-                        'Registrations': registrations,
-                        'Sessions': sessions,
-                        'Speakers': speakers,
-                        'Feedbacks': feedbacks,
-                        'SocialMediaPromotions': social_media_promotions,
-                    }
-                    return jsonify(event_dict)
-                else:
-                    return jsonify({})
-    except pymysql.Error as e:
-        print(f"Error fetching event details: {e}")
-        return jsonify({'error': str(e)})
-
+# -------------------- ADD EVENT --------------------
 @app.route('/add_event', methods=['GET', 'POST'])
 def add_event():
     try:
@@ -183,7 +157,6 @@ def add_event():
         return render_template('error.html', error_message=f"Error fetching venues/organizers: {e}")
 
     if request.method == 'POST':
-
         event_name = request.form.get('EventName')
         event_date = request.form.get('EventDate')
         venue_id = request.form.get('VenueID')
@@ -202,35 +175,26 @@ def add_event():
             with create_db_connection() as connection:
                 with connection.cursor(pymysql.cursors.DictCursor) as cursor:
                     cursor.execute(
-                    """
-                    INSERT INTO Events 
-                    (EventName, EventDate, StartTime, EndTime, Description, Status, Budget, VenueID, OrganizerID)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """,
-                    (event_name, event_date, start_time, end_time, description, status, budget, venue_id, organizer_id)
-                )
-                connection.commit()
-
-                with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                    cursor.execute("SELECT * FROM Events WHERE EventName=%s ORDER BY EventID DESC LIMIT 1", (event_name,))
-                    inserted_event = cursor.fetchone()
-                    print("Inserted event:", inserted_event)
-
+                        """
+                        INSERT INTO Events 
+                        (EventName, EventDate, StartTime, EndTime, Description, Status, Budget, VenueID, OrganizerID)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """,
+                        (event_name, event_date, start_time, end_time, description, status, budget, venue_id, organizer_id)
+                    )
+                    connection.commit()
             return redirect(url_for('index'))
-
         except pymysql.Error as e:
             return render_template('error.html', error_message=f"Error inserting event: {e}")
 
     return render_template('add_event.html', venues=venues, organizers=organizers)
 
-@app.route('/tickets', methods=['POST'])
-def buy_ticket():
-    data = request.json
-    event_id = data.get('event_id')
-    attendee_name = data.get('attendee_name')
-
-    if not event_id or not attendee_name:
-        return jsonify({'error': 'Event ID and attendee name are required'}), 400
+# -------------------- TICKET MANAGEMENT --------------------
+@app.route('/event_details/<int:event_id>/buy_ticket', methods=['POST'])
+def buy_ticket_form(event_id):
+    attendee_name = request.form.get('attendee_name')
+    if not attendee_name:
+        return redirect(url_for('event_details', event_id=event_id))
 
     try:
         with create_db_connection() as connection:
@@ -239,26 +203,30 @@ def buy_ticket():
                     "INSERT INTO Tickets (EventID, AttendeeName) VALUES (%s, %s)",
                     (event_id, attendee_name)
                 )
-            connection.commit()
-        return jsonify({'message': 'Ticket purchased successfully'}), 201
-    except pymysql.Error as e:
-        return jsonify({'error': str(e)}), 500
+                connection.commit()
+        # After buying ticket, redirect back to event details page
+        return redirect(url_for('event_details', event_id=event_id))
+
+    except Exception as e:
+        return render_template('error.html', error_message=f"Error purchasing ticket: {e}")
 
 @app.route('/events/<int:event_id>/tickets', methods=['GET'])
 def get_tickets(event_id):
     try:
         with create_db_connection() as connection:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("SELECT * FROM Tickets WHERE EventID=%s", (event_id,))
+                cursor.execute("SELECT * FROM tickets WHERE event_id = %s", (event_id,))
                 tickets = cursor.fetchall()
         return jsonify(tickets)
     except pymysql.Error as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
+# -------------------- ERROR HANDLER --------------------
 @app.errorhandler(Exception)
 def handle_exception(e):
     print(f"Unexpected error: {e}")
     return render_template('error.html', error_message=str(e))
 
+# -------------------- RUN APP --------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
