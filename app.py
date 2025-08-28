@@ -15,13 +15,22 @@ def login():
 
         if username == 'ucp' and password == 'ucp123':
             session['logged_in'] = True
+            session['username'] = username
+            session['role'] = 'manager'
             return redirect(url_for('index'))
+
+        elif username == 'customer' and password == 'cust123':
+            session['logged_in'] = True
+            session['username'] = username
+            session['role'] = 'customer'
+            return redirect(url_for('index'))
+
         else:
             error_message = 'Invalid credentials. Please try again.'
 
     return render_template('login.html', error_message=error_message)
 
-@app.route('/logout', methods=['GET'])
+@app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
@@ -65,6 +74,7 @@ def index():
 
 @app.route('/event_details/<int:event_id>')
 def event_details(event_id):
+    print("SESSION DATA:", session)
     try:
         with create_db_connection() as connection:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -177,6 +187,8 @@ def fetch_social_media_promotions(connection, event_id):
 # -------------------- ADD EVENT --------------------
 @app.route('/add_event', methods=['GET', 'POST'])
 def add_event():
+    if session.get('role') != 'manager':
+        return render_template('error.html', error_message="Access denied: managers only.")
     try:
         with create_db_connection() as connection:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:

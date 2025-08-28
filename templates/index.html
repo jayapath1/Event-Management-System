@@ -14,7 +14,7 @@
     </header>
 
     <nav>
-        {% if not session.logged_in %}
+        {% if not session.get('logged_in') %}
             <a href="{{ url_for('login') }}">Login</a>
         {% else %}
             <div class="logout-container">
@@ -23,10 +23,13 @@
         {% endif %}
     </nav>
 
+    {% if session.get('role') == 'manager' %}
     <div class="sidebar">
         <button class="add-event-btn" onclick="window.location.href='{{ url_for('add_event') }}'">
-            ＋ Add New Event</button>
+            ＋ Add New Event
+        </button>
     </div>
+    {% endif %}
 
     {% if events %}
     <div class="events-container">
@@ -42,7 +45,7 @@
                 <button class="event-details-toggle" onclick="toggleDetails(this)">View Details</button>
             </div>
 
-            <div class="event-details-content">
+            <div class="event-details-content" style="display: none;">
                 <p><strong>Description:</strong> {{ event['Description'] }}</p>
                 <p><strong>Budget:</strong> ${{ event['Budget'] }}</p>
                 <a href="{{ url_for('event_details', event_id=event['EventID']) }}" class="view-details-btn">Show More</a>
@@ -55,17 +58,17 @@
     {% endif %}
 
     <script>
-    function toggleDetails(button) {
-    const details = button.parentElement.nextElementSibling;
-    if (details.style.display === "block") {
-        details.style.display = "none";
-        button.textContent = "View Details";
-    } else {
-        details.style.display = "block";
-        button.textContent = "Hide Details";
-    }
-}
-</script>
+        function toggleDetails(button) {
+            const details = button.parentElement.nextElementSibling;
+            if (details.style.display === "block") {
+                details.style.display = "none";
+                button.textContent = "View Details";
+            } else {
+                details.style.display = "block";
+                button.textContent = "Hide Details";
+            }
+        }
+    </script>
 </body>
 
 </html>
