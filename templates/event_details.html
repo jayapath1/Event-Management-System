@@ -40,6 +40,12 @@
                 <p><strong>Venue:</strong> {{ venues['VenueName'] }}</p>
                 <p><strong>Capacity:</strong> {{ venues['Capacity'] }}</p>
                 <p><strong>Location:</strong> {{ venues['Location'] }}</p>
+                {% if session.get('role') == 'manager' %}
+                    <h2>Manage Event</h2>
+                    <form action="{{ url_for('delete_event', event_id=events['EventID']) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                        <button type="submit" class="delete-btn">Delete Event</button>
+                    </form>
+                {% endif %}
             </section>
             
             <section id="live-reactions" class="tab-content">
@@ -93,7 +99,7 @@
             </section>
                 
             <section id="tickets" class="tab-content">
-                
+
                 <form action="{{ url_for('buy_ticket_form', event_id=events['EventID']) }}" method="POST" class="ticket-form">
                     <label for="attendee_name">Your Name:</label>
                     <input type="text" id="attendee_name" name="attendee_name" required>

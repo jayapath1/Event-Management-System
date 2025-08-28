@@ -175,7 +175,26 @@ nav {
     display: block;
 }
 
-#mastodon-feed, #vr-status-panel {
+.delete-btn {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#mastodon-feed {
     background-color: #fdf8f2;
     border: 2px solid #d6c9b8;
     border-radius: 12px;
@@ -188,10 +207,6 @@ nav {
 
 #mastodon-feed {
     border-left: 5px solid #b17e5a;
-}
-
-#vr-status-panel {
-    border-left: 5px solid #8a5c3c;
 }
 
 .tab-content {

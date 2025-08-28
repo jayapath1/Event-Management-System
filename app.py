@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
 import pymysql
 
 app = Flask(__name__)
@@ -184,7 +184,7 @@ def fetch_social_media_promotions(connection, event_id):
         """, (event_id,))
         return cursor.fetchall()
 
-# -------------------- ADD EVENT --------------------
+# -------------------- ADD/DELETE EVENT --------------------
 @app.route('/add_event', methods=['GET', 'POST'])
 def add_event():
     if session.get('role') != 'manager':
@@ -231,6 +231,22 @@ def add_event():
             return render_template('error.html', error_message=f"Error inserting event: {e}")
 
     return render_template('add_event.html', venues=venues, organizers=organizers)
+
+@app.route('/delete_event/<int:event_id>', methods=['POST'])
+def delete_event(event_id):
+    if session.get("role") != "manager":
+        flash("Unauthorized action", "danger")
+        return redirect(url_for("index"))
+    try:
+        with create_db_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM Events WHERE EventID = %s", (event_id,))
+                connection.commit()
+        flash("Event deleted successfully!", "success")
+    except Exception as e:
+        flash(f"Error deleting event: {str(e)}", "danger")
+
+    return redirect(url_for("index"))
 
 # -------------------- TICKET MANAGEMENT --------------------
 @app.route('/event_details/<int:event_id>/buy_ticket', methods=['POST'])

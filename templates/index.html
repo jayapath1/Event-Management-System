@@ -1,74 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Event Management System</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <title>Event Management System</title>
+    </head>
 
-<body>
-    <header>
-        <h1>Event Management System</h1>
-    </header>
+        <body>
+            <header>
+                <h1>Event Management System</h1>
+            </header>
 
-    <nav>
-        {% if not session.get('logged_in') %}
-            <a href="{{ url_for('login') }}">Login</a>
-        {% else %}
-            <div class="logout-container">
-                <button class="logout-btn" onclick="window.location.href='/logout'">&#128274; Logout</button>
+            <nav>
+                {% if not session.get('logged_in') %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                {% else %}
+                    <div class="logout-container">
+                        <button class="logout-btn" onclick="window.location.href='/logout'">&#128274; Logout</button>
+                    </div>
+                {% endif %}
+            </nav>
+
+            {% if session.get('role') == 'manager' %}
+            <div class="sidebar">
+                <button class="add-event-btn" onclick="window.location.href='{{ url_for('add_event') }}'">
+                    ＋ Add New Event
+                </button>
             </div>
-        {% endif %}
-    </nav>
+            {% endif %}
 
-    {% if session.get('role') == 'manager' %}
-    <div class="sidebar">
-        <button class="add-event-btn" onclick="window.location.href='{{ url_for('add_event') }}'">
-            ＋ Add New Event
-        </button>
-    </div>
-    {% endif %}
+            {% if events %}
+            <div class="events-container">
+                {% for event in events %}
+                <div class="event-card">
+                    <h2>{{ event['EventName'] }}</h2>
+                    <div class="event-summary">
+                        <p><strong>Date:</strong> {{ event['EventDate'] }}</p>
+                        <p><strong>Time:</strong> {{ event['StartTime'] }} - {{ event['EndTime'] }}</p>
+                        <p><strong>Status:</strong> {{ event['Status'] }}</p>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="event-details-toggle" onclick="toggleDetails(this)">View Details</button>
+                    </div>
 
-    {% if events %}
-    <div class="events-container">
-        {% for event in events %}
-        <div class="event-card">
-            <h2>{{ event['EventName'] }}</h2>
-            <div class="event-summary">
-                <p><strong>Date:</strong> {{ event['EventDate'] }}</p>
-                <p><strong>Time:</strong> {{ event['StartTime'] }} - {{ event['EndTime'] }}</p>
-                <p><strong>Status:</strong> {{ event['Status'] }}</p>
+                    <div class="event-details-content" style="display: none;">
+                        <p><strong>Description:</strong> {{ event['Description'] }}</p>
+                        <p><strong>Budget:</strong> ${{ event['Budget'] }}</p>
+                        <a href="{{ url_for('event_details', event_id=event['EventID']) }}" class="view-details-btn">Show More</a>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            <div class="card-buttons">
-                <button class="event-details-toggle" onclick="toggleDetails(this)">View Details</button>
-            </div>
+            {% else %}
+            <p>No events available</p>
+            {% endif %}
 
-            <div class="event-details-content" style="display: none;">
-                <p><strong>Description:</strong> {{ event['Description'] }}</p>
-                <p><strong>Budget:</strong> ${{ event['Budget'] }}</p>
-                <a href="{{ url_for('event_details', event_id=event['EventID']) }}" class="view-details-btn">Show More</a>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p>No events available</p>
-    {% endif %}
-
-    <script>
-        function toggleDetails(button) {
-            const details = button.parentElement.nextElementSibling;
-            if (details.style.display === "block") {
-                details.style.display = "none";
-                button.textContent = "View Details";
-            } else {
-                details.style.display = "block";
-                button.textContent = "Hide Details";
-            }
-        }
-    </script>
-</body>
-
+            <script>
+                function toggleDetails(button) {
+                    const details = button.parentElement.nextElementSibling;
+                    if (details.style.display === "block") {
+                        details.style.display = "none";
+                        button.textContent = "View Details";
+                    } else {
+                        details.style.display = "block";
+                        button.textContent = "Hide Details";
+                    }
+                }
+            </script>
+        </body>
 </html>
