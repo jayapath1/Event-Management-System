@@ -332,17 +332,53 @@ nav {
     font-family: 'Poppins', sans-serif;
 }
 
+/* Ticket Form Styling */
 .ticket-form {
-    margin-bottom: 1em;
+    background-color: #fdf6ed;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 20px auto;
+    font-family: 'Arial', sans-serif;
 }
+
 .ticket-form input {
-    padding: 0.5em;
-    margin-right: 0.5em;
+    width: calc(100% - 12px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #d4b483;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border 0.3s;
 }
+
+.ticket-form input:focus {
+    border-color: #b99263;
+    outline: none;
+    box-shadow: 0 0 5px rgba(185, 146, 131, 0.5);
+}
+
 .ticket-form button {
-    padding: 0.5em 1em;
+    width: 100%;
+    padding: 12px;
     background: #d4b483;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-weight: bold;
+    color: #fff;
+    font-size: 1em;
+}
+
+.ticket-form button:hover {
+    background: #b99263;
+    transform: translateY(-2px);
+}
+
+.ticket-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #6b4f3c;
 }

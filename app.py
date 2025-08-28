@@ -81,10 +81,11 @@ def event_details(event_id):
             organizer = fetch_organizer_details(connection)
             attendees = fetch_attendees(connection, event_id)
             registrations = fetch_registrations(connection)
-            sessions = fetch_sessions(connection)
-            speakers = fetch_speakers(connection)
+            sessions = fetch_sessions(connection, event_id)
+            speakers = fetch_speakers(connection, event_id)
             feedbacks = fetch_feedbacks(connection)
-            social_media_promotions = fetch_social_media_promotions(connection)
+            social_media_promotions = fetch_social_media_promotions(connection, event_id)
+            sponsors = fetch_sponsors(connection, event_id)
 
         return render_template(
             'event_details.html',
@@ -98,6 +99,7 @@ def event_details(event_id):
             speakers=speakers,
             feedbacks=feedbacks,
             social_media_promotions=social_media_promotions,
+            sponsors=sponsors
         )
     except pymysql.Error as e:
         print(f"Error fetching event details: {e}")
@@ -129,14 +131,33 @@ def fetch_registrations(connection):
         cursor.execute("SELECT * FROM Registrations")
         return cursor.fetchall()
 
-def fetch_sessions(connection):
+def fetch_sessions(connection, event_id):
     with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM Sessions")
+        cursor.execute("""
+            SELECT s.SessionID, s.Title, s.StartTime, s.EndTime, sp.SpeakerName
+            FROM Sessions s
+            JOIN Speakers sp ON s.SpeakerID = sp.SpeakerID
+            WHERE s.EventID = %s
+        """, (event_id,))
         return cursor.fetchall()
 
-def fetch_speakers(connection):
+def fetch_speakers(connection, event_id):
     with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM Speakers")
+        cursor.execute("""
+            SELECT DISTINCT sp.SpeakerID, sp.SpeakerName, sp.Bio
+            FROM Speakers sp
+            JOIN Sessions s ON sp.SpeakerID = s.SpeakerID
+            WHERE s.EventID = %s
+        """, (event_id,))
+        return cursor.fetchall()
+    
+def fetch_sponsors(connection, event_id):
+    with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        cursor.execute("""
+            SELECT SponsorName, ContactPerson, ContactNumber
+            FROM Sponsors
+            WHERE SponsorID = %s
+        """, (event_id,))
         return cursor.fetchall()
 
 def fetch_feedbacks(connection):
@@ -144,9 +165,13 @@ def fetch_feedbacks(connection):
         cursor.execute("SELECT * FROM Feedback")
         return cursor.fetchall()
 
-def fetch_social_media_promotions(connection):
+def fetch_social_media_promotions(connection, event_id):
     with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM SocialMediaPromotion")
+        cursor.execute("""
+            SELECT Platform, Content, DatePosted
+            FROM SocialMediaPromotion
+            WHERE EventID = %s
+        """, (event_id,))
         return cursor.fetchall()
 
 # -------------------- ADD EVENT --------------------
@@ -199,6 +224,8 @@ def add_event():
 @app.route('/event_details/<int:event_id>/buy_ticket', methods=['POST'])
 def buy_ticket_form(event_id):
     attendee_name = request.form.get('attendee_name')
+    attendee_email = request.form.get('attendee_email')
+    attendee_phone = request.form.get('attendee_phone')
     if not attendee_name:
         return redirect(url_for('event_details', event_id=event_id))
 
@@ -212,26 +239,27 @@ def buy_ticket_form(event_id):
         with create_db_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO Attendees (FirstName, LastName) VALUES (%s, %s)",
-                    (first_name, last_name)
+                    "INSERT INTO Attendees (FirstName, LastName, Email, ContactNumber) VALUES (%s, %s, %s, %s)",
+                    (first_name, last_name, attendee_email, attendee_phone)
                 )
                 attendee_id = cursor.lastrowid
-
-                cursor.execute(
-                    "INSERT INTO Registrations (EventID, AttendeeID, RegistrationDate) VALUES (%s, %s, CURDATE())",
-                    (event_id, attendee_id)
-                )
 
                 cursor.execute(
                     "INSERT INTO Tickets (EventID, AttendeeName) VALUES (%s, %s)",
                     (event_id, attendee_name)
                 )
+
+                cursor.execute(
+                    "INSERT INTO Registrations (EventID, AttendeeID) VALUES (%s, %s)",
+                    (event_id, attendee_id)
+                )
+
                 connection.commit()
+
         return redirect(url_for('event_details', event_id=event_id))
 
     except Exception as e:
         return render_template('error.html', error_message=f"Error purchasing ticket: {e}")
-
 
 @app.route('/events/<int:event_id>/tickets', methods=['GET'])
 def get_tickets(event_id):
