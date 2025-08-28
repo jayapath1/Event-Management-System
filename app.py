@@ -70,15 +70,16 @@ def event_details(event_id):
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 cursor.execute("SELECT * FROM Events WHERE EventID=%s", (event_id,))
                 event = cursor.fetchone()
+
+                if not event:
+                    return render_template('event_details.html', events={})
+
                 cursor.execute("SELECT * FROM Tickets WHERE EventID=%s", (event_id,))
                 tickets = cursor.fetchall()
 
-            if not event:
-                return render_template('event_details.html', event={})
-
             venues = fetch_venue_details(connection)
             organizer = fetch_organizer_details(connection)
-            attendees = fetch_attendees(connection)
+            attendees = fetch_attendees(connection, event_id)
             registrations = fetch_registrations(connection)
             sessions = fetch_sessions(connection)
             speakers = fetch_speakers(connection)
@@ -113,9 +114,14 @@ def fetch_organizer_details(connection):
         cursor.execute("SELECT * FROM Organizers LIMIT 1")
         return cursor.fetchone()
 
-def fetch_attendees(connection):
+def fetch_attendees(connection, event_id):
     with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM Attendees")
+        cursor.execute("""
+            SELECT a.FirstName, a.LastName
+            FROM Attendees a
+            JOIN Registrations r ON a.AttendeeID = r.AttendeeID
+            WHERE r.EventID = %s
+        """, (event_id,))
         return cursor.fetchall()
 
 def fetch_registrations(connection):
@@ -196,19 +202,36 @@ def buy_ticket_form(event_id):
     if not attendee_name:
         return redirect(url_for('event_details', event_id=event_id))
 
+    if " " in attendee_name:
+        first_name, last_name = attendee_name.split(" ", 1)
+    else:
+        first_name = attendee_name
+        last_name = ""
+
     try:
         with create_db_connection() as connection:
             with connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO Attendees (FirstName, LastName) VALUES (%s, %s)",
+                    (first_name, last_name)
+                )
+                attendee_id = cursor.lastrowid
+
+                cursor.execute(
+                    "INSERT INTO Registrations (EventID, AttendeeID, RegistrationDate) VALUES (%s, %s, CURDATE())",
+                    (event_id, attendee_id)
+                )
+
                 cursor.execute(
                     "INSERT INTO Tickets (EventID, AttendeeName) VALUES (%s, %s)",
                     (event_id, attendee_name)
                 )
                 connection.commit()
-        # After buying ticket, redirect back to event details page
         return redirect(url_for('event_details', event_id=event_id))
 
     except Exception as e:
         return render_template('error.html', error_message=f"Error purchasing ticket: {e}")
+
 
 @app.route('/events/<int:event_id>/tickets', methods=['GET'])
 def get_tickets(event_id):

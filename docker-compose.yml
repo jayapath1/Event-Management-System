@@ -21,6 +21,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: jayapath
       MYSQL_DATABASE: EMS
+    ports:
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./ems.sql:/docker-entrypoint-initdb.d/ems.sql

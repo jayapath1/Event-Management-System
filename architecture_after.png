@@ -18,11 +18,3 @@
                                 | Mastodon Instance (Cyber  |
                                 | Lab, already deployed)    |
                                 +---------------------------+
-
-                                            |
-                                            | Event Data Export
-                                            v
-                                +---------------------------+
-                                |   VR Export Service       |
-                                | (JSON/CSV/API Endpoint)   |
-                                +---------------------------+
