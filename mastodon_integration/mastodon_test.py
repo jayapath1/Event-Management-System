@@ -1,8 +1,16 @@
-from mastodon import Mastodon
+from mastodon_client import connect, post_event, post_chatter
 
-mastodon = Mastodon(
-    access_token="PASTE_YOUR_TOKEN_HERE",
-    api_base_url="https://cyberlab.mastodon"
-)
+# Replace with your testing credentials
+API_BASE_URL = "https://cyberlab.mastodon"
+ACCESS_TOKEN = "YOUR_ACCESS_TOKEN"
 
-mastodon.toot("Hello from Event Management System 🚀")
+if __name__ == "__main__":
+    mastodon = connect(API_BASE_URL, ACCESS_TOKEN)
+
+    # Test posting an event
+    post_event(mastodon, "Jazz Night", "2025-09-15", "The Hall")
+
+    # Test attendee chatter
+    post_chatter(mastodon, "Jazz Night", num_posts=2)
+
+    print("✅ Test posts sent!")
