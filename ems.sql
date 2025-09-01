@@ -120,25 +120,6 @@ CREATE TABLE EventPayments (
     FOREIGN KEY(PaymentID) REFERENCES Payments(PaymentID)
 );
 
-CREATE TABLE IF NOT EXISTS mastodon_posts (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  event_id BIGINT NOT NULL,
-  kind ENUM('announcement','threshold','attendee') NOT NULL,
-  mastodon_status_id VARCHAR(64) NULL,
-  url VARCHAR(255) NULL,
-  account_username VARCHAR(80) NULL,
-  visibility VARCHAR(20) DEFAULT 'public',
-  content TEXT NOT NULL,
-  posted_at DATETIME NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  failed TINYINT(1) DEFAULT 0,
-  fail_reason TEXT NULL,
-  INDEX idx_event_id (event_id),
-  CONSTRAINT fk_masto_event
-    FOREIGN KEY (event_id) REFERENCES events(id)
-    ON DELETE CASCADE
-);
-
 INSERT INTO Venues (VenueID, VenueName, Capacity, Location, ContactPerson, ContactNumber)
 VALUES
     (1, 'Lahore Convention Center', 1000, 'Johar Town, Lahore', 'Ali Khan', '+92 300 1234567'),

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
+from mastodon_integration.mastodon_service import post_event_announcement
 import pymysql
 
 app = Flask(__name__)
@@ -305,6 +306,12 @@ def get_tickets(event_id):
 def handle_exception(e):
     print(f"Unexpected error: {e}")
     return render_template('error.html', error_message=str(e))
+
+# -------------------- MASTODON INTEGRATION --------------------
+@app.route('/create_event', methods=['POST'])
+def create_event():
+    mastodon.toot(f"New event: {event_name} on {event_date}!")
+    return "Event created!"
 
 # -------------------- RUN APP --------------------
 if __name__ == '__main__':
