@@ -9,25 +9,25 @@ The **Event Management System (EMS)** is a web application built using **Flask**
 - Detailed event pages, including information on:
   - Venues
   - Attendees
-  - Tasks
   - Payments
-  - Catering, and more!
+  - Tickets
+  - Live Event Announcements, and more!
 
 ## Project Structure
 ```
 Event-Management-System/
 │
-├── app.py                # Main Flask application
+├── app.py                 # Main Flask application
 ├── requirements.txt
 ├── static/
-│   ├── style.css         # Main CSS file
-│   └── styles.css        # Additional CSS file
+│   ├── style.css          # Main CSS file
+│   └── styles.css         # Additional CSS file
 ├── templates/
-│   ├── index.html        # Dashboard
-│   ├── login.html        # Login page
-│   ├── error.html        # Error page
-│   └── event_details.html# Detailed event page
-├── ems.sql  # SQL script to set up MySQL database
+│   ├── index.html         # Dashboard
+│   ├── login.html         # Login page
+│   ├── error.html         # Error page
+│   └── event_details.html # Detailed event page
+├── ems.sql                # SQL script to set up MySQL database
 ├── architecture_before.png
 ├── architecture_after.png
 ├── Dockerfile
@@ -36,10 +36,8 @@ Event-Management-System/
 
 ## Prerequisites
 Make sure you have the following installed:
-- **Python 3.x**
-- **Flask**: `pip install Flask`
-- **MySQL**: Ensure you have MySQL server installed and running.
-- **pymysql**: `pip install pymysql`
+- **Docker**
+- **Docker Compose**
 
 ## MySQL Setup Instructions
 
@@ -79,9 +77,9 @@ This will create all the necessary tables like `Events`, `Attendees`, `Venues`, 
    ```bash
    pip install -r requirements.txt
    ```
-3. Run the Flask application:
+3. Build and Run the container in Docker:
    ```bash
-   python app.py
+   docker-compose up --build
    ```
 4. Open your browser and navigate to:
    ```
