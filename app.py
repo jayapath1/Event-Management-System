@@ -1,7 +1,11 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
-from mastodon_integration.mastodon_service import post_event_announcement
+from mastodon_integration.mastodon_service import MastodonService
 import pymysql
 
+mastodon_service = MastodonService(
+    api_base_url="http://cyberlab.mastodon",  # placeholder URL
+    access_token="YOUR_ACCESS_TOKEN"          # placeholder token
+)
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'
 
@@ -227,6 +231,21 @@ def add_event():
                         (event_name, event_date, start_time, end_time, description, status, budget, venue_id, organizer_id)
                     )
                     connection.commit()
+                    event_id = cursor.lastrowid
+
+            try:
+                venue_name = next((v['VenueName'] for v in venues if v['VenueID'] == int(venue_id)), "Unknown Venue")
+
+                mastodon_post_id = mastodon_service.post_event_announcement(
+                    event_name=event_name,
+                    date=event_date,
+                    venue=venue_name,
+                    ticket_link=f"http://localhost:5000/event_details/{event_id}/buy_ticket"
+                )
+                print(f"Mastodon post ID: {mastodon_post_id}")
+            except Exception as e:
+                print(f"Failed to post to Mastodon: {e}")
+            
             return redirect(url_for('index'))
         except pymysql.Error as e:
             return render_template('error.html', error_message=f"Error inserting event: {e}")
@@ -248,6 +267,24 @@ def delete_event(event_id):
         flash(f"Error deleting event: {str(e)}", "danger")
 
     return redirect(url_for("index"))
+
+@app.route('/complete_event/<int:event_id>', methods=['POST'])
+def complete_event(event_id):
+    try:
+        with create_db_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE Events SET Status='Completed' WHERE EventID=%s", (event_id,))
+                connection.commit()
+
+        try:
+            mastodon_service.post_event_wrapup(event_name=f"Event {event_id}")
+        except Exception as e:
+            print(f"Failed to post wrap-up: {e}")
+
+        flash("Event marked as completed.", "success")
+        return redirect(url_for('event_details', event_id=event_id))
+    except Exception as e:
+        return render_template('error.html', error_message=str(e))
 
 # -------------------- TICKET MANAGEMENT --------------------
 @app.route('/event_details/<int:event_id>/buy_ticket', methods=['POST'])
@@ -283,7 +320,27 @@ def buy_ticket_form(event_id):
                     (event_id, attendee_id)
                 )
 
+                cursor.execute("SELECT Capacity FROM Events WHERE EventID=%s", (event_id,))
+                capacity = cursor.fetchone()['Capacity']
+
+                cursor.execute("SELECT COUNT(*) as sold_count FROM Tickets WHERE EventID=%s", (event_id,))
+                sold_count = cursor.fetchone()['sold_count']
+
+                tickets_remaining = capacity - sold_count
+
                 connection.commit()
+
+        if tickets_remaining <= 10 and tickets_remaining > 0:
+            try:
+                mastodon_service.post_attendee_chatter(
+                    event_name=f"Event {event_id}",
+                    num_posts=1
+                )
+                print(f"Low tickets alert posted! {tickets_remaining} tickets remaining.")
+            except Exception as e:
+                print(f"Failed to post low tickets alert: {e}")
+        elif tickets_remaining <= 0:
+            print("Event sold out!")
 
         return redirect(url_for('event_details', event_id=event_id))
 
@@ -308,10 +365,7 @@ def handle_exception(e):
     return render_template('error.html', error_message=str(e))
 
 # -------------------- MASTODON INTEGRATION --------------------
-@app.route('/create_event', methods=['POST'])
-def create_event():
-    mastodon.toot(f"New event: {event_name} on {event_date}!")
-    return "Event created!"
+
 
 # -------------------- RUN APP --------------------
 if __name__ == '__main__':
