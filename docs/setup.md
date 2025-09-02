@@ -45,13 +45,15 @@ http://127.0.0.1:5000
 
 ## 6. Login and Use the Application
 
-Using the default credential to log in:
+Credential for the Managers:
 Username: 'ucp'
 Password: 'ucp123'
 
-View the list of events, and click on any event for detailed information.
+Credentials for customers:
+Username: 'customer'
+Password: 'cust123'
 
-Logout using the button in the header.
+Customers and Managers are both able to view the list of events, and click on any event for detailed information an logout using the button in the header. Whereas managers have a button for creating extra events.
 
 ## Troubleshooting
 MySQL Connection Issues:
