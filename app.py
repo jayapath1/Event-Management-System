@@ -365,7 +365,23 @@ def handle_exception(e):
     return render_template('error.html', error_message=str(e))
 
 # -------------------- MASTODON INTEGRATION --------------------
+@app.route('/api/mastodon_feed/<event_id>')
+def mastodon_feed(event_id):
+    posts = [
+        {"user": "Alice", "text": "Can't wait for this event!", "time": "2025-09-15 18:00"},
+        {"user": "Bob", "text": "This is going to be amazing! 🎶", "time": "2025-09-15 18:05"},
+        {"user": "Charlie", "text": "Who's joining me?", "time": "2025-09-15 18:10"}
+    ]
+    return jsonify(posts)
 
+@app.route('/post_to_mastodon/<int:event_id>', methods=['POST'])
+def post_to_mastodon(event_id):
+    message = request.form.get('message')
+    
+    print(f"[Dummy Mastodon Post] Event {event_id}: {message}")
+    
+    flash("Dummy Mastodon post sent!")
+    return redirect(url_for('event_details', event_id=event_id))
 
 # -------------------- RUN APP --------------------
 if __name__ == '__main__':
