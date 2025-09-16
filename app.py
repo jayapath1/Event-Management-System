@@ -3,8 +3,8 @@ from mastodon_integration.mastodon_service import MastodonService
 import pymysql
 
 mastodon_service = MastodonService(
-    api_base_url="http://cyberlab.mastodon",  # placeholder URL
-    access_token="YOUR_ACCESS_TOKEN"          # placeholder token
+    access_token="3LQQJYrmIsz_vh29jW0RWy1hep798JL3qICviZaOnc0",
+    api_base_url="http://localhost:3000"
 )
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'
@@ -367,12 +367,22 @@ def handle_exception(e):
 # -------------------- MASTODON INTEGRATION --------------------
 @app.route('/api/mastodon_feed/<event_id>')
 def mastodon_feed(event_id):
-    posts = [
-        {"user": "Alice", "text": "Can't wait for this event!", "time": "2025-09-15 18:00"},
-        {"user": "Bob", "text": "This is going to be amazing! 🎶", "time": "2025-09-15 18:05"},
-        {"user": "Charlie", "text": "Who's joining me?", "time": "2025-09-15 18:10"}
-    ]
-    return jsonify(posts)
+    try:
+        # Fetch event details to get its name for hashtag
+        with create_db_connection() as connection:
+            with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+                cursor.execute("SELECT EventName FROM Events WHERE EventID=%s", (event_id,))
+                event = cursor.fetchone()
+                if not event:
+                    return jsonify([])
+
+        event_name = event['EventName']
+        # Fetch posts from Mastodon using event name as hashtag
+        posts = mastodon_service.fetch_posts_for_event(event_name, limit=10)
+        return jsonify(posts)
+    except Exception as e:
+        print(f"Error fetching Mastodon feed: {e}")
+        return jsonify([])
 
 @app.route('/post_to_mastodon/<int:event_id>', methods=['POST'])
 def post_to_mastodon(event_id):

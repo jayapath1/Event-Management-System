@@ -7,8 +7,8 @@ class MastodonService:
         Initialize Mastodon service with API URL and access token.
         """
         self.mastodon = Mastodon(
-            access_token=access_token,
-            api_base_url=api_base_url
+            access_token= "3LQQJYrmIsz_vh29jW0RWy1hep798JL3qICviZaOnc0",
+            api_base_url="http://localhost:3000"
         )
 
     def post_event_announcement(self, event_name: str, date: str, venue: str, ticket_link: str = None):
@@ -49,3 +49,22 @@ class MastodonService:
             msg += f" Photos & highlights: {summary_link}"
         post = self.mastodon.toot(msg)
         return post.id
+    
+    def fetch_posts_for_event(self, event_name: str, limit: int = 10):
+        """
+        Fetch last posts for an event using a hashtag.
+        """
+        hashtag = event_name.replace(" ", "")
+        try:
+            posts = self.mastodon.timeline_hashtag(hashtag, limit=limit)
+            result = []
+            for post in posts:
+                result.append({
+                    "user": post["account"]["username"],
+                    "text": post["content"],
+                    "time": post["created_at"].isoformat()
+                })
+            return result
+        except Exception as e:
+            print(f"Error fetching posts for event {event_name}: {e}")
+            return []
