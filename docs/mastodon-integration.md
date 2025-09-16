@@ -6,8 +6,8 @@ The Event Management System (EMS) integrates with a Mastodon server to simulate 
 
 Prerequisites
 Access to Mastodon server (Cyberlab instance)
-    - URL: http://<CYBERLAB_MASTODON_URL>
-    - API access token: <INSERT_TOKEN_HERE>
+    - URL: http://<localhost:3000>
+    - API access token: <3LQQJYrmIsz_vh29jW0RWy1hep798JL3qICviZaOnc0>
 
 [Admin/EMS UI] 
     └──> [Backend: Event Created]
