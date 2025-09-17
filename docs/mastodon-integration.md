@@ -6,6 +6,8 @@ The Event Management System (EMS) integrates with a Mastodon server to simulate 
 
 Prerequisites
 Access to Mastodon server (Cyberlab instance)
+Mastodon Instance on Ronin
+ssh -i ~/.ssh/mastodon.pem -L 3000:localhost:3000 ubuntu@mastodon.uoa.cloud
     - URL: http://<localhost:3000>
     - API access token: <3LQQJYrmIsz_vh29jW0RWy1hep798JL3qICviZaOnc0>
 
