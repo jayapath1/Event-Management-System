@@ -8,31 +8,48 @@
         <title>Event Management System</title>
     </head>
 
-        <body>
-            <header>
-                <h1>Event Management System</h1>
-            </header>
+    <body>
+        <header>
+            <h1>Event Management System</h1>
+        </header>
 
-            <nav>
-                {% if not session.get('logged_in') %}
-                    <a href="{{ url_for('login') }}">Login</a>
-                {% else %}
-                    <div class="logout-container">
-                        <button class="logout-btn" onclick="window.location.href='/logout'">&#128274; Logout</button>
-                    </div>
-                {% endif %}
-            </nav>
+        <nav>
+            {% if not session.get('logged_in') %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% else %}
+            <div class="logout-container">
+                <button class="logout-btn" onclick="window.location.href='/logout'">&#128274; Logout</button>
+            </div>
+            {% endif %}
+        </nav>
 
+        <div class="main-container">
             {% if session.get('role') == 'manager' %}
             <div class="sidebar">
                 <button class="add-event-btn" onclick="window.location.href='{{ url_for('add_event') }}'">
                     ＋ Add New Event
                 </button>
+
+                <div class="mastodon-feed-box">
+                    <h3>#CyberlabEvents Feed</h3>
+                    <div id="mastodon-feed">
+                        <p>Loading posts...</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="sidebar">
+                <div class="mastodon-feed-box">
+                    <h3>#CyberlabEvents Feed</h3>
+                    <div id="mastodon-feed">
+                        <p>Loading posts...</p>
+                    </div>
+                </div>
             </div>
             {% endif %}
 
-            {% if events %}
             <div class="events-container">
+                {% if events %}
                 {% for event in events %}
                 <div class="event-card">
                     <h2>{{ event['EventName'] }}</h2>
@@ -52,22 +69,56 @@
                     </div>
                 </div>
                 {% endfor %}
+                {% else %}
+                <p>No events available</p>
+                {% endif %}
             </div>
-            {% else %}
-            <p>No events available</p>
-            {% endif %}
+        </div>
 
-            <script>
-                function toggleDetails(button) {
-                    const details = button.parentElement.nextElementSibling;
-                    if (details.style.display === "block") {
-                        details.style.display = "none";
-                        button.textContent = "View Details";
-                    } else {
-                        details.style.display = "block";
-                        button.textContent = "Hide Details";
-                    }
+        <script>
+            function toggleDetails(button) {
+                const details = button.parentElement.nextElementSibling;
+                if (details.style.display === "block") {
+                    details.style.display = "none";
+                    button.textContent = "View Details";
+                } else {
+                    details.style.display = "block";
+                    button.textContent = "Hide Details";
                 }
-            </script>
-        </body>
+            }
+
+            async function loadMastodonFeed() {
+                const feedContainer = document.getElementById('mastodon-feed');
+                feedContainer.innerHTML = "<p>Loading posts...</p>";
+
+                try {
+                    const response = await fetch('/api/mastodon_feed/cyberlabevents');
+                    const posts = await response.json();
+
+                    if (posts.length === 0) {
+                        feedContainer.innerHTML = "<p>No posts yet.</p>";
+                        return;
+                    }
+
+                    feedContainer.innerHTML = "";
+                    posts.forEach(post => {
+                        const postDiv = document.createElement('div');
+                        postDiv.className = "mastodon-post";
+                        postDiv.innerHTML = `
+                            <p><strong>@${post.user}</strong> <span>${new Date(post.time).toLocaleString()}</span></p>
+                            <p>${post.text}</p>
+                            <hr>
+                        `;
+                        feedContainer.appendChild(postDiv);
+                    });
+                } catch (err) {
+                    feedContainer.innerHTML = "<p>Error loading posts.</p>";
+                    console.error(err);
+                }
+            }
+
+            loadMastodonFeed();
+            setInterval(loadMastodonFeed, 30000);
+        </script>
+    </body>
 </html>

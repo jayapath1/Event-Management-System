@@ -4,3 +4,4 @@ faker
 cryptography
 Mastodon.py
 PyYAML
+beautifulsoup4

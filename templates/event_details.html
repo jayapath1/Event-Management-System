@@ -22,7 +22,6 @@
 
             <div class="tabs">
                 <button type="submit" class="tab-button active" onclick="openTab(event, 'overview')">Overview</button>
-                <button type="submit" class="tab-button" onclick="openTab(event, 'live-reactions')">Live Reactions</button>
                 <button type="submit" class="tab-button" onclick="openTab(event, 'more-info')">More Info</button>
                 <button type="submit" class="tab-button" onclick="openTab(event, 'tickets')">Tickets</button>
             </div>
@@ -45,13 +44,6 @@
                         <button type="submit" class="delete-btn">Delete Event</button>
                     </form>
                 {% endif %}
-            </section>
-
-            <section id="live-reactions" class="tab-content">
-                <h2>Live Reactions</h2>
-                <div id="mastodon-feed">
-                    <p>Loading live reactions from Mastodon...</p>
-                </div>
             </section>
 
             <section id="more-info" class="tab-content">

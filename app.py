@@ -240,7 +240,8 @@ def add_event():
                     event_name=event_name,
                     date=event_date,
                     venue=venue_name,
-                    ticket_link=f"http://localhost:5000/event_details/{event_id}/buy_ticket"
+                    ticket_link = f"http://127.0.0.1:5000/event_details/{event_id}/buy_ticket",
+                    hashtags=["CyberlabEvents", "NewEvent"]
                 )
                 print(f"Mastodon post ID: {mastodon_post_id}")
             except Exception as e:
@@ -292,6 +293,7 @@ def buy_ticket_form(event_id):
     attendee_name = request.form.get('attendee_name')
     attendee_email = request.form.get('attendee_email')
     attendee_phone = request.form.get('attendee_phone')
+
     if not attendee_name:
         return redirect(url_for('event_details', event_id=event_id))
 
@@ -303,7 +305,7 @@ def buy_ticket_form(event_id):
 
     try:
         with create_db_connection() as connection:
-            with connection.cursor() as cursor:
+            with connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 cursor.execute(
                     "INSERT INTO Attendees (FirstName, LastName, Email, ContactNumber) VALUES (%s, %s, %s, %s)",
                     (first_name, last_name, attendee_email, attendee_phone)
@@ -320,8 +322,10 @@ def buy_ticket_form(event_id):
                     (event_id, attendee_id)
                 )
 
-                cursor.execute("SELECT Capacity FROM Events WHERE EventID=%s", (event_id,))
-                capacity = cursor.fetchone()['Capacity']
+                cursor.execute("SELECT EventName, Capacity FROM Events WHERE EventID=%s", (event_id,))
+                event = cursor.fetchone()
+                event_name = event['EventName']
+                capacity = event['Capacity']
 
                 cursor.execute("SELECT COUNT(*) as sold_count FROM Tickets WHERE EventID=%s", (event_id,))
                 sold_count = cursor.fetchone()['sold_count']
@@ -330,17 +334,26 @@ def buy_ticket_form(event_id):
 
                 connection.commit()
 
-        if tickets_remaining <= 10 and tickets_remaining > 0:
+        if tickets_remaining > 0 and tickets_remaining <= 10:
             try:
                 mastodon_service.post_attendee_chatter(
-                    event_name=f"Event {event_id}",
-                    num_posts=1
+                    event_name=event_name,
+                    num_posts=1,
+                    hashtags=["CyberlabEvents"]
                 )
                 print(f"Low tickets alert posted! {tickets_remaining} tickets remaining.")
             except Exception as e:
                 print(f"Failed to post low tickets alert: {e}")
         elif tickets_remaining <= 0:
-            print("Event sold out!")
+            try:
+                mastodon_service.post_attendee_chatter(
+                    event_name=event_name,
+                    num_posts=1,
+                    hashtags=["CyberlabEvents"]
+                )
+                print("Event sold out! Mastodon notification sent.")
+            except Exception as e:
+                print(f"Failed to post sold-out alert: {e}")
 
         return redirect(url_for('event_details', event_id=event_id))
 
@@ -365,33 +378,17 @@ def handle_exception(e):
     return render_template('error.html', error_message=str(e))
 
 # -------------------- MASTODON INTEGRATION --------------------
-@app.route('/api/mastodon_feed/<event_id>')
-def mastodon_feed(event_id):
+@app.route('/api/mastodon_feed/cyberlabevents')
+def mastodon_feed():
+    """
+    Fetch latest #CyberlabEvents posts from Mastodon for EMS sidebar.
+    """
     try:
-        # Fetch event details to get its name for hashtag
-        with create_db_connection() as connection:
-            with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("SELECT EventName FROM Events WHERE EventID=%s", (event_id,))
-                event = cursor.fetchone()
-                if not event:
-                    return jsonify([])
-
-        event_name = event['EventName']
-        # Fetch posts from Mastodon using event name as hashtag
-        posts = mastodon_service.fetch_posts_for_event(event_name, limit=10)
+        posts = mastodon_service.fetch_posts_by_hashtag("CyberlabEvents", limit=10)
         return jsonify(posts)
     except Exception as e:
-        print(f"Error fetching Mastodon feed: {e}")
+        print(f"Error fetching CyberlabEvents posts: {e}")
         return jsonify([])
-
-@app.route('/post_to_mastodon/<int:event_id>', methods=['POST'])
-def post_to_mastodon(event_id):
-    message = request.form.get('message')
-    
-    print(f"[Dummy Mastodon Post] Event {event_id}: {message}")
-    
-    flash("Dummy Mastodon post sent!")
-    return redirect(url_for('event_details', event_id=event_id))
 
 # -------------------- RUN APP --------------------
 if __name__ == '__main__':

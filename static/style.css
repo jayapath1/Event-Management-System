@@ -194,35 +194,8 @@ nav {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-#mastodon-feed {
-    background-color: #fdf8f2;
-    border: 2px solid #d6c9b8;
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 16px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    font-size: 0.95rem;
-    color: #3b3b3b;
-}
-
-#mastodon-feed {
-    border-left: 5px solid #b17e5a;
-}
-
 .tab-content {
     transition: all 0.3s ease;
-}
-
-@media screen and (max-width: 768px) {
-    .tabs {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: center;
-    }
-    .tab-button {
-        width: 90%;
-        text-align: center;
-    }
 }
 
 /* Add Event Form Styling */
@@ -396,4 +369,66 @@ nav {
     margin-bottom: 5px;
     font-weight: bold;
     color: #6b4f3c;
+}
+/* Mastodon Styling */
+.main-container {
+    display: flex;
+    gap: 2rem;
+    margin: 20px;
+}
+
+.sidebar {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mastodon-feed-box {
+    background-color: #fff;
+    border: 1px solid #d1c7b8;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.mastodon-feed-box h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.2rem;
+    color: #4d3737;
+    text-align: center;
+    font-weight: 600;
+}
+
+.mastodon-post {
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fafafa;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mastodon-post:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.mastodon-post p {
+    margin: 4px 0;
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+
+.mastodon-post strong {
+    color: #b17e5a;
+}
+
+.mastodon-post span {
+    font-size: 0.75rem;
+    color: #777;
+    margin-left: 6px;
 }
