@@ -13,6 +13,15 @@ The **Event Management System (EMS)** is a web application built using **Flask**
   - Tickets
   - Live Event Announcements, and more!
 
+### Machine Details
+- EMS Server: Ubuntu 22.04, 2 vCPUs, 4GB RAM, Ronin Cloud VM (IP: 10.0.8.125)
+- Mastodon Server: Ubuntu 24.04 LTS, 2 vCPUs, 8GB RAM, Ronin Cloud VM (IP: 10.0.8.119)
+- Ports: EMS (5000), Mastodon (3000), MySQL (3306 inside EMS VM)
+
+### Important Files
+- `mastodon_service.py`: Custom wrapper for Mastodon API (included in `mastodon_integration/`).
+- `mastodon_test.py`: Script to manually test posting to Mastodon before enabling automatic posts. 
+
 ## Project Structure
 ```
 Event-Management-System/
