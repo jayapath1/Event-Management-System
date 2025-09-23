@@ -194,6 +194,7 @@ def fetch_social_media_promotions(connection, event_id):
 def add_event():
     if session.get('role') != 'manager':
         return render_template('error.html', error_message="Access denied: managers only.")
+
     try:
         with create_db_connection() as connection:
             with connection.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -235,18 +236,18 @@ def add_event():
 
             try:
                 venue_name = next((v['VenueName'] for v in venues if v['VenueID'] == int(venue_id)), "Unknown Venue")
-
+                hashtags = ["CyberlabEvents", event_name.replace(" ", "")]
                 mastodon_post_id = mastodon_service.post_event_announcement(
                     event_name=event_name,
                     date=event_date,
                     venue=venue_name,
-                    ticket_link = f"http://127.0.0.1:5000/event_details/{event_id}/buy_ticket",
-                    hashtags=["CyberlabEvents", "NewEvent"]
+                    ticket_link=f"http://127.0.0.1:5000/event_details/{event_id}/buy_ticket",
+                    hashtags=hashtags
                 )
-                print(f"Mastodon post ID: {mastodon_post_id}")
+                app.logger.info(f"[DEBUG] Mastodon post created: {mastodon_post_id}")
             except Exception as e:
-                print(f"Failed to post to Mastodon: {e}")
-            
+                app.logger.error(f"Failed to post event announcement to Mastodon: {e}")
+
             return redirect(url_for('index'))
         except pymysql.Error as e:
             return render_template('error.html', error_message=f"Error inserting event: {e}")
@@ -297,11 +298,7 @@ def buy_ticket_form(event_id):
     if not attendee_name:
         return redirect(url_for('event_details', event_id=event_id))
 
-    if " " in attendee_name:
-        first_name, last_name = attendee_name.split(" ", 1)
-    else:
-        first_name = attendee_name
-        last_name = ""
+    first_name, last_name = (attendee_name.split(" ", 1) if " " in attendee_name else (attendee_name, ""))
 
     try:
         with create_db_connection() as connection:
@@ -312,15 +309,8 @@ def buy_ticket_form(event_id):
                 )
                 attendee_id = cursor.lastrowid
 
-                cursor.execute(
-                    "INSERT INTO Tickets (EventID, AttendeeName) VALUES (%s, %s)",
-                    (event_id, attendee_name)
-                )
-
-                cursor.execute(
-                    "INSERT INTO Registrations (EventID, AttendeeID) VALUES (%s, %s)",
-                    (event_id, attendee_id)
-                )
+                cursor.execute("INSERT INTO Tickets (EventID, AttendeeName) VALUES (%s, %s)", (event_id, attendee_name))
+                cursor.execute("INSERT INTO Registrations (EventID, AttendeeID) VALUES (%s, %s)", (event_id, attendee_id))
 
                 cursor.execute("SELECT EventName, Capacity FROM Events WHERE EventID=%s", (event_id,))
                 event = cursor.fetchone()
@@ -331,29 +321,21 @@ def buy_ticket_form(event_id):
                 sold_count = cursor.fetchone()['sold_count']
 
                 tickets_remaining = capacity - sold_count
-
                 connection.commit()
 
-        if tickets_remaining > 0 and tickets_remaining <= 10:
+        hashtags = ["CyberlabEvents", event_name.replace(" ", "")]
+        if 0 < tickets_remaining <= 10:
             try:
-                mastodon_service.post_attendee_chatter(
-                    event_name=event_name,
-                    num_posts=1,
-                    hashtags=["CyberlabEvents"]
-                )
-                print(f"Low tickets alert posted! {tickets_remaining} tickets remaining.")
+                mastodon_service.post_attendee_chatter(event_name=event_name, num_posts=1, hashtags=hashtags + ["LowTickets"])
+                app.logger.info(f"[DEBUG] Low tickets Mastodon post for event {event_name}. Remaining: {tickets_remaining}")
             except Exception as e:
-                print(f"Failed to post low tickets alert: {e}")
+                app.logger.error(f"Failed low tickets post: {e}")
         elif tickets_remaining <= 0:
             try:
-                mastodon_service.post_attendee_chatter(
-                    event_name=event_name,
-                    num_posts=1,
-                    hashtags=["CyberlabEvents"]
-                )
-                print("Event sold out! Mastodon notification sent.")
+                mastodon_service.post_attendee_chatter(event_name=event_name, num_posts=1, hashtags=hashtags + ["SoldOut"])
+                app.logger.info(f"[DEBUG] Sold-out Mastodon post for event {event_name}")
             except Exception as e:
-                print(f"Failed to post sold-out alert: {e}")
+                app.logger.error(f"Failed sold-out post: {e}")
 
         return redirect(url_for('event_details', event_id=event_id))
 
@@ -389,6 +371,21 @@ def mastodon_feed():
     except Exception as e:
         print(f"Error fetching CyberlabEvents posts: {e}")
         return jsonify([])
+
+@app.route('/post_to_mastodon/<int:event_id>', methods=['POST'])
+def post_to_mastodon(event_id):
+    message = request.form.get('message')
+    if not message:
+        flash("Cannot post empty message", "warning")
+        return redirect(url_for('event_details', event_id=event_id))
+    
+    try:
+        mastodon_service.mastodon.toot(message)
+        flash("Mastodon post sent!", "success")
+    except Exception as e:
+        flash(f"Failed to post to Mastodon: {e}", "danger")
+    
+    return redirect(url_for('event_details', event_id=event_id))
 
 # -------------------- RUN APP --------------------
 if __name__ == '__main__':

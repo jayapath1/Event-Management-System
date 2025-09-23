@@ -34,6 +34,16 @@
                 <p><strong>Status:</strong> {{ events['Status'] }}</p>
                 <p><strong>Budget:</strong> ${{ events['Budget'] }}</p>
 
+                {% if session.get('role') == 'manager' %}
+                <div id="mastodon_feed">
+                    <h4>Post to Mastodon</h4>
+                    <form method="POST" action="{{ url_for('post_to_mastodon', event_id=events['EventID']) }}">
+                        <textarea name="message" rows="3" placeholder="Write your Mastodon post..."></textarea><br>
+                        <button type="submit">Post</button>
+                    </form>
+                </div>
+                {% endif %}
+
                 <h2>Venue Details</h2>
                 <p><strong>Venue:</strong> {{ venues['VenueName'] }}</p>
                 <p><strong>Capacity:</strong> {{ venues['Capacity'] }}</p>
