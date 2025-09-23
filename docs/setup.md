@@ -62,3 +62,4 @@ MySQL Connection Issues:
 - Make sure the EMS database and tables exist
 Python Package Error:
 - Run **pip install -r requirements.txt**.
+- SSH with port forwarding (ssh -i ~/.ssh/event-management-system.pem ubuntu@event-management-system.uoa.cloud)

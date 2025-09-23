@@ -26,10 +26,14 @@ Run Python test script:
 ```bash
 python mastodon_test.py
 ```
-
 Expected output → event announcement posts to Mastodon.
 
-## 6. Full Deployment Verification
+## 6. EMS Web Frontend
+```bash
+ssh -i ~/.ssh/event-management-system.pem -L 5000:localhost:5000 ubuntu@event-management-system.uoa.cloud
+```
+
+## 7. Full Deployment Verification
 1. Open frontend → `http://localhost:5000`
 2. Create new event
 3. Check Mastodon timeline for automatic post
