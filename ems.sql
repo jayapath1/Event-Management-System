@@ -184,10 +184,10 @@ INSERT INTO Feedback (EventID, AttendeeID, Rating, Comments) VALUES
 (4, 5, 3, 'Good summit, but networking opportunities felt limited.');
 
 INSERT INTO SocialMediaPromotion (EventID, Platform, Content, DatePosted) VALUES
-(1, 'Twitter', 'Get ready for #SydneyTechExpo 2025! 🚀', '2025-01-05'),
-(2, 'Facebook', 'Melbourne Food & Wine Festival is back this February! 🍷', '2025-02-01'),
-(3, 'Instagram', 'Adelaide Arts Festival 🎭 Join the celebration of creativity!', '2025-03-01'),
-(4, 'LinkedIn', 'Brisbane Startup Summit 2025 – connect with innovators!', '2025-03-25'),
-(5, 'Twitter', 'Perth Sustainability Conference 🌏 Future starts here.', '2025-04-20');
+(1, 'Twitter', 'Get ready for #SydneyTechExpo 2025!', '2025-01-05'),
+(2, 'Facebook', 'Melbourne Food & Wine Festival is back this February!', '2025-02-01'),
+(3, 'Instagram', 'Adelaide Arts Festival! Join the celebration of creativity!', '2025-03-01'),
+(4, 'LinkedIn', 'Brisbane Startup Summit 2025 - connect with innovators!', '2025-03-25'),
+(5, 'Twitter', 'Perth Sustainability Conference! Future starts here.', '2025-04-20');
 
 Show tables;
