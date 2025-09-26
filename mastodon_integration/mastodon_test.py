@@ -13,4 +13,4 @@ if __name__ == "__main__":
     # Post simulated attendee chatter
     mastodon.post_attendee_chatter("Jazz Night", num_posts=2)
 
-    print("✅ Test posts sent!")
+    print("Test posts sent!")

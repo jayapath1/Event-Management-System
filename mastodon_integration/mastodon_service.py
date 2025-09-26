@@ -13,7 +13,7 @@ class MastodonService:
         )
 
     def post_event_announcement(self, event_name: str, date: str, venue: str, ticket_link: str = None, hashtags=None):
-        msg = f"🎉 New Event: {event_name} at {venue} on {date}!"
+        msg = f"New Event: {event_name} at {venue} on {date}!"
         if ticket_link:
             msg += f" Tickets: {ticket_link}"
         if hashtags:
@@ -40,8 +40,6 @@ class MastodonService:
 
     def post_event_wrapup(self, event_name: str, summary_link: str = None, hashtags=None):
         msg = f"Thanks for attending {event_name}! 🎉"
-        if summary_link:
-            msg += f" Photos & highlights: {summary_link}"
         if hashtags:
             msg += " " + " ".join(f"#{tag}" for tag in hashtags)
         post = self.mastodon.toot(msg)
