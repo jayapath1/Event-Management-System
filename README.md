@@ -11,16 +11,8 @@ The **Event Management System (EMS)** is a web application built using **Flask**
   - Attendees
   - Payments
   - Tickets
-  - Live Event Announcements, and more!
-
-### Machine Details
-- EMS Server: Ubuntu 22.04, 2 vCPUs, 4GB RAM, Ronin Cloud VM (IP: 10.0.8.125)
-- Mastodon Server: Ubuntu 24.04 LTS, 2 vCPUs, 8GB RAM, Ronin Cloud VM (IP: 10.0.8.119)
-- Ports: EMS (5000), Mastodon (3000), MySQL (3306 inside EMS VM)
-
-### Important Files
-- `mastodon_service.py`: Custom wrapper for Mastodon API (included in `mastodon_integration/`).
-- `mastodon_test.py`: Script to manually test posting to Mastodon before enabling automatic posts. 
+  - Live Event Announcements, 
+  - Automated Mastodon event announcements + attendee chatter simulation and more!
 
 ## Project Structure
 ```
@@ -45,36 +37,8 @@ Event-Management-System/
 
 ## Prerequisites
 Make sure you have the following installed:
-- **Docker**
-- **Docker Compose**
-
-## MySQL Setup Instructions
-
-Before running the application, you need to set up the MySQL database.
-
-### 1. MySQL Configuration in `app.py`
-
-The MySQL connection details in `app.py` are:
-```python
-app.config['MYSQL_HOST'] = '127.0.0.1'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '12345'
-app.config['MYSQL_DB'] = 'EMS'
-```
-**Ensure that your MySQL configuration matches these values**. If your credentials differ:
-- Update the `app.config` section in `app.py` with your own MySQL host, username, password, and database name.
-
-### 2. Running the SQL Script
-
-To set up the database structure, follow these steps:
-1. **Open MySQL Workbench** or use the **MySQL command line**.
-2. **Run the provided SQL script** (`ems.sql`) to create the necessary tables for the system.
-
-**Using MySQL command line**:
-```bash
-mysql -u root -p EMS < path_to_event_management.sql
-```
-This will create all the necessary tables like `Events`, `Attendees`, `Venues`, etc., based on the structure defined in the script.
+- Docker & Docker Compose
+- Python 3.10+ with pip
 
 ## Running the Project
 1. Clone the repository:
