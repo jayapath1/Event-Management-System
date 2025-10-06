@@ -2,10 +2,8 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 from mastodon_integration.mastodon_service import MastodonService
 import pymysql
 
-mastodon_service = MastodonService(
-    access_token="3LQQJYrmIsz_vh29jW0RWy1hep798JL3qICviZaOnc0",
-    api_base_url="http://localhost:3000"
-)
+mastodon_service = MastodonService()
+
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'
 

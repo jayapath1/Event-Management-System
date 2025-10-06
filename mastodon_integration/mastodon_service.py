@@ -1,15 +1,19 @@
 from mastodon import Mastodon
 import random
 from bs4 import BeautifulSoup
+import json
+
+with open("config.json") as f:
+    config = json.load(f)
+
+MASTODON_BASE_URL = config.get("MASTODON_BASE_URL", "http://localhost:3000")
+MASTODON_ACCESS_TOKEN = config.get("MASTODON_ACCESS_TOKEN")
 
 class MastodonService:
-    def __init__(self, api_base_url: str, access_token: str):
-        """
-        Initialize Mastodon service with API URL and access token.
-        """
+    def __init__(self):
         self.mastodon = Mastodon(
-            access_token=access_token,
-            api_base_url=api_base_url
+            access_token=MASTODON_ACCESS_TOKEN,
+            api_base_url=MASTODON_BASE_URL
         )
 
     def post_event_announcement(self, event_name: str, date: str, venue: str, ticket_link: str = None, hashtags=None):
