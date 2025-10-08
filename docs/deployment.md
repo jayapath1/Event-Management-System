@@ -16,7 +16,7 @@ Mastodon Server
 
 ## Install Prerequisites on EMS Server
 # Update system
-sudo apt update && sudo apt upgrade -y
+sudo apt update & sudo apt upgrade -y
 
 # Install dependencies
 sudo apt install -y git docker.io docker-compose python3 python3-pip
@@ -25,7 +25,8 @@ sudo apt install -y git docker.io docker-compose python3 python3-pip
 git --version
 docker --version
 docker-compose --version
-python3 --version (Python 3.10+ recommended)
+sudo apt install -y python3.10 python3.10-venv python3.10-dev python3-pip
+python3 --version
 pip3 --version
 
 ## 1. Clone Repository
@@ -91,6 +92,9 @@ Update config.json in the EMS project root:
   "MASTODON_ACCESS_TOKEN": "your_token_here"
 }
 
+- Replace `"your_token_here"` with the access token for the EventManager account.
+- This allows EMS to automatically post events and chatter to your Mastodon instance.
+
 ## 8. Mastodon Integration Test
 Run Python test script:
 ```bash
@@ -129,5 +133,6 @@ Expected output → event announcement posts to Mastodon.
 
 ## Important Files
 - `mastodon_service.py`: Custom wrapper for Mastodon API (included in `mastodon_integration/`).
-- `mastodon_test.py`: Script to manually test posting to Mastodon before enabling automatic posts. 
+- `mastodon_test.py`: Script to manually test posting to Mastodon using the credentials in 
+    config.json ensuring that Mastodon integration is working before enabling automatic posts. 
 - `config.json`: Stores Mastodon base URL and access token.
