@@ -71,7 +71,7 @@ Open frontend → `http://localhost:5000`
 
 ## 5. Mastodon Setup
 1. Start the Mastodon Ronin VM.
-2. Move the SSH key to the correct place and set permissions:
+2. Move the SSH key to your local machine:
 ```bash
 mkdir -p ~/.ssh
 mv mastodon.pem ~/.ssh/mastodon.pem
