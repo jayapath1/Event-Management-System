@@ -68,7 +68,7 @@ This will:
 - Build frontend (HTML/JS)
 - Start MySQL database
 
-Open frontend → `http://localhost:5000`
+Open frontend → `http://localhost:5001`
 
 ## 5. Mastodon Setup
 1. Start the Mastodon Ronin VM.
